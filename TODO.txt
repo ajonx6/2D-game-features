@@ -1,0 +1,3 @@
+Make entity system component-based + example entity e.g. tree
+Tiles have an entity, fixed/not-fixed
+Player animation frame
