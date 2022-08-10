@@ -1,21 +1,29 @@
 package com.curaxu.game.level;
 
+import com.curaxu.game.graphics.SpriteSheets;
 import com.curaxu.game.Game;
+import com.curaxu.game.entity.Entity;
 import com.curaxu.game.graphics.Screen;
 import com.curaxu.game.graphics.Sprite;
-import com.curaxu.game.graphics.SpriteSheet;
-import com.curaxu.game.graphics.SpriteSheets;
 
 public abstract class Tile {
-    protected int x, y;
+    public static final int GRASS_ID = 1;
+    public static final int WATER_ID = 2;
+
+    protected int worldX, worldY;
+    protected int screenX, screenY;
     protected int tx, ty;
     protected int id;
     protected Sprite sprite;
     protected Level level;
+    protected Entity ontop;
+
 
     public Tile(int tx, int ty, int id, Sprite sprite, Level level) {
-        this.x = tx * Game.TILE_SIZE;
-        this.y = ty * Game.TILE_SIZE;
+        this.worldX = tx * Game.TILE_SIZE;
+        this.worldY = ty * Game.TILE_SIZE;
+        this.screenX = worldX;
+        this.screenY = worldY;
         this.tx = tx;
         this.ty = ty;
         this.id = id;
@@ -36,8 +44,6 @@ public abstract class Tile {
         boolean l = leftID == id;
         boolean r = rightID == id;
 
-        // sprite = new Sprite(SpriteSheets.tile_sheet.getSprite(sheetx + 1, sheety + 1), c1, c2, c3, c4);
-
         if (u && d && l && r) sprite = new Sprite(SpriteSheets.tile_sheet.getSprite(sheetx + 1, sheety + 1), c1, c2, c3, c4); //1 1
         if (u && d && l && !r) sprite = new Sprite(SpriteSheets.tile_sheet.getSprite(sheetx + 2, sheety + 1), c1, c2, c3, c4); //2 1
         if (u && d && !l && r) sprite = new Sprite(SpriteSheets.tile_sheet.getSprite(sheetx, sheety + 1), c1, c2, c3, c4); //0 1
@@ -56,19 +62,21 @@ public abstract class Tile {
         if (!u && !d && !l && !r) sprite = new Sprite(SpriteSheets.tile_sheet.getSprite(sheetx, sheety + 3), c1, c2, c3, c4); //0 3
     }
 
-    public abstract void renderBonus(Screen screen);
+    public void tick() {
+        screenX = worldX + Game.getInstance().getScreen().xOffset;
+        screenY = worldY + Game.getInstance().getScreen().yOffset;
+    }
 
     public void render(Screen screen) {
-        screen.renderSprite(x, y, sprite);
-        renderBonus(screen);
+        screen.renderSprite(screenX, screenY, sprite);
     }
 
-    public int getX() {
-        return x;
+    public int getWorldX() {
+        return worldX;
     }
 
-    public int getY() {
-        return y;
+    public int getWorldY() {
+        return worldY;
     }
 
     public int getID() {

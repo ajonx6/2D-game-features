@@ -1,7 +1,7 @@
 package com.curaxu.game.gfx;
 
-import com.curaxu.game.Game;
 import com.curaxu.game.util.Timer;
+import com.curaxu.game.Game;
 
 public class Fade2 {
 	public static final int INACTIVE = 0;

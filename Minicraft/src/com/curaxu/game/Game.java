@@ -9,9 +9,11 @@ import java.awt.image.DataBufferInt;
 
 import javax.swing.JFrame;
 
-import com.curaxu.game.entity.Entity;
-import com.curaxu.game.graphics.*;
+import com.curaxu.game.entity.*;
+import com.curaxu.game.graphics.SpriteSheets;
 import com.curaxu.game.level.Level;
+import com.curaxu.game.graphics.Screen;
+import com.curaxu.game.graphics.Sprite;
 
 public class Game extends Canvas implements Runnable {
 	private static final long serialVersionUID = 1L;
@@ -32,14 +34,18 @@ public class Game extends Canvas implements Runnable {
 	public JFrame frame;
 	public boolean running;
 
-	public Screen screen;
-	public Level level;
-	public Entity player;
+	private Screen screen;
+	private Level level;
+	public Player player;
 
 	private Game() {
 		screen = new Screen(PIXEL_WIDTH, PIXEL_HEIGHT);
-		level = new Level(100, 100, SpriteSheets.tile_sheet);
-		player = new Entity(level);
+		level = new Level(128, 72);
+		player = new Player();
+		player.addComponent(new SpriteList(player, new Sprite(SpriteSheets.tile_sheet.getSprite(1), 0xFFEAB2E6, 0XFFBED9F7, 0XFFF44B6A, 0), new Sprite(SpriteSheets.tile_sheet.getSprite(2), 0xFFEAB2E6, 0XFFBED9F7, 0XFFF44B6A, 0XFF93D2F9)));
+		player.addComponent(new AABBBox(player, player.getWorldX(), player.getWorldY(), Game.TILE_SIZE, Game.TILE_SIZE));
+		player.addComponent(new Move(player, 2));
+		player.addComponent(new Swim(player));
 
 		addKeyListener(new KeyInput());
 	}
@@ -119,6 +125,7 @@ public class Game extends Canvas implements Runnable {
 		}
 
 		KeyInput.tick(delta);
+		level.tick();
 		player.tick();
 		// if (Fade.state != Fade.INACTIVE) Fade.tick(delta);
 	}
@@ -142,5 +149,13 @@ public class Game extends Canvas implements Runnable {
 		g.drawImage(image, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
 		g.dispose();
 		bs.show();
+	}
+
+	public Screen getScreen() {
+		return screen;
+	}
+
+	public Level getLevel() {
+		return level;
 	}
 }

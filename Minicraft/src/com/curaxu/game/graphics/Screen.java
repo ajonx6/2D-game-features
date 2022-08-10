@@ -3,7 +3,7 @@ package com.curaxu.game.graphics;
 import com.curaxu.game.Game;
 
 public class Screen {
-    public static int xOffset = 0, yOffset = 0;
+    public int xOffset = 0, yOffset = 0;
 
     private int width, height;
     private int[] pixels;
@@ -27,13 +27,27 @@ public class Screen {
         }
     }
 
+
+
+    public void renderRect(int x, int y, int w, int h, int colour) {
+        for (int yy = 0; yy < h; yy++) {
+            int yp = y + yy;
+            for (int xx = 0; xx < w; xx++) {
+                int xp = x + xx;
+                if (inBounds(xp, yp)) {
+                    setPixel(xp + yp * width, colour);
+                }
+            }
+        }
+    }
+
     public void renderGraySprite(int x, int y, GrayscaleSprite sprite) {
         int[] pixels = sprite.getPixels();
         for (int yy = 0; yy < Game.TILE_SIZE; yy++) {
-            int yp = y + yy + yOffset;
+            int yp = y + yy;
             for (int xx = 0; xx < Game.TILE_SIZE; xx++) {
-                int xp = x + xx + xOffset;
-                if (inBounds(xp, yp, false)) setPixel(xp + yp * width, pixels[xx + yy * Game.TILE_SIZE]);
+                int xp = x + xx;
+                if (inBounds(xp, yp)) setPixel(xp + yp * width, pixels[xx + yy * Game.TILE_SIZE]);
             }
         }
     }
@@ -41,17 +55,17 @@ public class Screen {
     public void renderSprite(int x, int y, Sprite sprite) {
         int[] pixels = sprite.getPixels();
         for (int yy = 0; yy < Game.TILE_SIZE; yy++) {
-            int yp = y + yy + yOffset;
+            int yp = y + yy;
             for (int xx = 0; xx < Game.TILE_SIZE; xx++) {
-                int xp = x + xx + xOffset;
-                if (inBounds(xp, yp, false)) {
+                int xp = x + xx;
+                if (inBounds(xp, yp)) {
                     setPixel(xp + yp * width, pixels[xx + yy * Game.TILE_SIZE]);
                 }
             }
         }
     }
 
-    public boolean inBounds(int xp, int yp, boolean useOffsets) {
+    public boolean inBounds(int xp, int yp) {
         return xp >= 0 && yp >= 0 && xp < width && yp < height;
     }
 
