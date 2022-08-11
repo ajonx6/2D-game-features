@@ -1,18 +1,14 @@
 package com.curaxu.game.level;
 
+import com.curaxu.game.Vector;
+import com.curaxu.game.entity.*;
 import com.curaxu.game.graphics.SpriteSheets;
 import com.curaxu.game.Game;
-import com.curaxu.game.entity.AABBBox;
-import com.curaxu.game.entity.Collisions;
-import com.curaxu.game.entity.Entity;
-import com.curaxu.game.entity.SpriteList;
 import com.curaxu.game.graphics.Screen;
 import com.curaxu.game.graphics.Sprite;
 import com.curaxu.game.util.SimplexNoise;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Level {
     private int levelWidth, levelHeight;
@@ -62,9 +58,9 @@ public class Level {
                 t.setSprite();
                 if (t instanceof GrassTile) {
                     if (random.nextDouble() > 0.95) {
-                        Entity tree = new Entity(t.worldX, t.worldY, "tree");
-                        tree.addComponent(new SpriteList(tree, new Sprite(SpriteSheets.tile_sheet.getSprite(3, 0), 0xFF704629, 0xFF438759, 0xFF54A86E, 0)));
-                        tree.addComponent(new AABBBox(tree, tree.getWorldX(), tree.getWorldY(), Game.TILE_SIZE, Game.TILE_SIZE));
+                        Entity tree = new Entity(t.getWorldPos(), "tree");
+                        tree.addComponent(new SpriteList(tree, new Sprite(SpriteSheets.tile_sheet.getSprite(3, 0, 1, 1), 0xFF704629, 0xFF438759, 0xFF54A86E, 0)));
+                        tree.addComponent(new AABBBox(tree, tree.getWorldPos(), Game.TILE_SIZE, Game.TILE_SIZE));
                         t.ontop = tree;
                         entities.add(tree);
                     }
@@ -88,24 +84,40 @@ public class Level {
         return tiles[i];
     }
 
-    public Tile getTileAtWorldPos(int x, int y) {
-        return getTile(x / Game.TILE_SIZE, y / Game.TILE_SIZE);
+    public Tile getTileAtWorldPos(Vector position) {
+        return getTile((int) Math.floor(position.getX() / Game.TILE_SIZE), (int) Math.floor(position.getY() / Game.TILE_SIZE));
     }
 
     public boolean tileInBounds(Screen screen, Tile t) {
-        int up = t.getWorldY() + screen.yOffset;
-        int down = t.getWorldY() + Game.TILE_SIZE + screen.yOffset;
-        int left = t.getWorldX() + screen.xOffset;
-        int right = t.getWorldX() + Game.TILE_SIZE + screen.xOffset;
+        double up = t.getWorldPos().getY() + screen.getOffset().getY();
+        double down = t.getWorldPos().getY() + Game.TILE_SIZE + screen.getOffset().getY();
+        double left = t.getWorldPos().getX() + screen.getOffset().getX();
+        double right = t.getWorldPos().getX() + Game.TILE_SIZE + screen.getOffset().getX();
 
         return up < Game.PIXEL_HEIGHT && down >= 0 && left < Game.PIXEL_WIDTH && right >= 0;
+    }
+
+    public List<Entity> getSurroundingTileCollisions(Tile t, String tag, AABBBox a) {
+        List<Entity> cs = new ArrayList<>();
+        for (int y = -1; y <= 1; y++) {
+            for (int x = -1; x <= 1; x++) {
+                Tile s = getTile(t.tx + x, t.ty + y);
+                if (s != null && s.getOntop() != null) {
+                    AABBBox b = (AABBBox) s.getOntop().getComponent("AABBBox");
+                    if (b != null && s.getOntop().getTag().equals(tag) && Collisions.collisionWithBox(a, b)) {
+                        cs.add(s.getOntop());
+                    }
+                }
+            }
+        }
+        return cs;
     }
 
     public List<Entity> boxEntityCollisionAll(String tag, AABBBox a) {
         List<Entity> cs = new ArrayList<>();
         for (Entity e : entities) {
             if (!e.getTag().equals(tag)) continue;
-            AABBBox b = (AABBBox) e.getComponent("aabb");
+            AABBBox b = (AABBBox) e.getComponent("AABBBox");
             if (b != null && Collisions.collisionWithBox(a, b)) cs.add(e);
         }
         return cs;
@@ -114,20 +126,26 @@ public class Level {
     public Entity boxEntityCollisionFirst(String tag, AABBBox a) {
         for (Entity e : entities) {
             if (!e.getTag().equals(tag)) continue;
-            AABBBox b = (AABBBox) e.getComponent("aabb");
+            AABBBox b = (AABBBox) e.getComponent("AABBBox");
             if (b != null && Collisions.collisionWithBox(a, b)) return e;
         }
         return null;
     }
 
-    public void tick() {
+    public void tick(double delta) {
         for (Tile t : tiles) {
             t.tick();
         }
 
         for (Entity e : entities) {
-            e.tick();
+            e.tick(delta);
         }
+
+        // entities.sort((e1, e2) -> {
+        //     if (e2.getWorldPos().getY() >= e1.getWorldPos().getY()) return -1;
+        //     if (e1.getWorldPos().getY() >= e2.getWorldPos().getY()) return 1;
+        //     return 0;
+        // });
     }
 
     public void render(Screen screen) {
@@ -138,6 +156,14 @@ public class Level {
         for (Entity e : entities) {
             e.render(screen);
         }
+    }
+
+    public void addEntity(Entity e) {
+        entities.add(e);
+    }
+
+    public List<Entity> getEntities() {
+        return entities;
     }
 
     public int getWidth() {

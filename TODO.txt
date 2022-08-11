@@ -1,3 +1,9 @@
-add and test basic sounds
-remove player class and turn into entity components
-collision resolution
+need:
+  add and test basic sounds
+  fix stutter bug
+  collision resolution
+  let tiles be solid (maybe implement as id array not tile array)
+  add animation and input like collisions
+
+future ideas:
+  particles in a circle or box or based on a textures alpha

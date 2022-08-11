@@ -8,8 +8,6 @@ public class KeyInput extends KeyAdapter {
 	public static final boolean[] keys = new boolean[NUM_KEYS];
 	public static final boolean[] lastKeys = new boolean[NUM_KEYS];
 
-	public static final double FACING_THRESHOLD = 5.0;
-
 	public void keyPressed(KeyEvent e) {
 		keys[e.getKeyCode()] = true;
 	}
@@ -18,7 +16,7 @@ public class KeyInput extends KeyAdapter {
 		keys[e.getKeyCode()] = false;
 	}
 
-	public static void tick(double delta) {
+	public static void tick() {
 		for (int i = 0; i < NUM_KEYS; i++) {
 			lastKeys[i] = keys[i];
 		}

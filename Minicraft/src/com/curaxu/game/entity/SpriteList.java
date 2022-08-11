@@ -1,5 +1,6 @@
 package com.curaxu.game.entity;
 
+import com.curaxu.game.Vector;
 import com.curaxu.game.graphics.Sprite;
 import com.curaxu.game.graphics.Screen;
 
@@ -13,10 +14,13 @@ public class SpriteList extends Component {
         System.arraycopy(sprites, 0, this.sprites, 0, sprites.length);
     }
 
-    public void tick() {}
+    public void tick(double delta) {
+        entity.setCenterWorldPos(entity.getWorldPos().add(new Vector(sprites[index].getWidth(), sprites[index].getHeight()).div(2)));
+    }
 
     public void render(Screen screen) {
-        screen.renderSprite(entity.screenX, entity.screenY, sprites[index]);
+        if (index < 0 || index >= sprites.length) index = 0;
+        screen.renderSprite(entity.getScreenPos(), sprites[index]);
     }
 
     public void setIndex(int index) {

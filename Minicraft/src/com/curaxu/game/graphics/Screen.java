@@ -1,10 +1,10 @@
 package com.curaxu.game.graphics;
 
 import com.curaxu.game.Game;
+import com.curaxu.game.Vector;
 
 public class Screen {
-    public int xOffset = 0, yOffset = 0;
-
+    private Vector offset = new Vector();
     private int width, height;
     private int[] pixels;
 
@@ -29,11 +29,11 @@ public class Screen {
 
 
 
-    public void renderRect(int x, int y, int w, int h, int colour) {
+    public void renderRect(Vector pos, int w, int h, int colour) {
         for (int yy = 0; yy < h; yy++) {
-            int yp = y + yy;
+            int yp = (int) (pos.getY() + yy);
             for (int xx = 0; xx < w; xx++) {
-                int xp = x + xx;
+                int xp = (int) (pos.getX() + xx);
                 if (inBounds(xp, yp)) {
                     setPixel(xp + yp * width, colour);
                 }
@@ -41,23 +41,23 @@ public class Screen {
         }
     }
 
-    public void renderGraySprite(int x, int y, GrayscaleSprite sprite) {
+    public void renderGraySprite(Vector pos, GrayscaleSprite sprite) {
         int[] pixels = sprite.getPixels();
         for (int yy = 0; yy < Game.TILE_SIZE; yy++) {
-            int yp = y + yy;
+            int yp = (int) (pos.getY() + yy);
             for (int xx = 0; xx < Game.TILE_SIZE; xx++) {
-                int xp = x + xx;
+                int xp = (int) (pos.getX() + xx);
                 if (inBounds(xp, yp)) setPixel(xp + yp * width, pixels[xx + yy * Game.TILE_SIZE]);
             }
         }
     }
 
-    public void renderSprite(int x, int y, Sprite sprite) {
+    public void renderSprite(Vector pos, Sprite sprite) {
         int[] pixels = sprite.getPixels();
         for (int yy = 0; yy < Game.TILE_SIZE; yy++) {
-            int yp = y + yy;
+            int yp = (int) (pos.getY() + yy);
             for (int xx = 0; xx < Game.TILE_SIZE; xx++) {
-                int xp = x + xx;
+                int xp = (int) (pos.getX() + xx);
                 if (inBounds(xp, yp)) {
                     setPixel(xp + yp * width, pixels[xx + yy * Game.TILE_SIZE]);
                 }
@@ -79,17 +79,14 @@ public class Screen {
         }
     }
 
-    // public void up(double d) { yOffset+=d; }
-    //
-    // public void down(double d) { yOffset-=d; }
-    //
-    // public void left(double d) { xOffset+=d; }
-    //
-    // public void right(double d) { xOffset-=d; }
 
-    // public int getXOffset() { return xOffset; }
-    //
-    // public int getYOffset() { return yOffset; }
+    public void setOffset(Vector v) {
+        offset = new Vector(v);
+    }
+
+    public Vector getOffset() {
+        return offset;
+    }
 
     public int getWidth() {
         return width;

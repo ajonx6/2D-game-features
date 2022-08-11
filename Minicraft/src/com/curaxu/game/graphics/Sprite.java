@@ -14,7 +14,8 @@ public class Sprite {
 
     public Sprite(GrayscaleSprite sprite, int c1, int c2, int c3, int c4) {
         int[] ps = sprite.getPixels();
-        pixels = new int[ps.length];
+        this.sprite = sprite;
+        this.pixels = new int[ps.length];
 
         for (int i = 0; i < ps.length; i++) {
             if (ps[i] == COLOR0) pixels[i] = 0x0;
@@ -38,6 +39,14 @@ public class Sprite {
 
     public GrayscaleSprite getGrayscaleSprite() {
         return sprite;
+    }
+
+    public int getWidth() {
+        return sprite.getWidth();
+    }
+
+    public int getHeight() {
+        return sprite.getHeight();
     }
 
     public int[] getPixels() {

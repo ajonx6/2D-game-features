@@ -19,7 +19,7 @@ public abstract class Component {
         return entity;
     }
 
-    public abstract void tick();
+    public abstract void tick(double delta);
 
     public abstract void render(Screen screen);
 

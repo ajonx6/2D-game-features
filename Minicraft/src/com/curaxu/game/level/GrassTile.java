@@ -1,8 +1,8 @@
 package com.curaxu.game.level;
 
 public class GrassTile extends Tile {
-    public GrassTile(int x, int y, Level level) {
-        super(x, y, GRASS_ID, null, level);
+    public GrassTile(int tx, int ty, Level level) {
+        super(tx, ty, GRASS_ID, null, level);
     }
 
     public void setSprite() {

@@ -1,8 +1,8 @@
 package com.curaxu.game.level;
 
 public class WaterTile extends Tile {
-    public WaterTile(int x, int y, Level level) {
-        super(x, y, WATER_ID, null, level);
+    public WaterTile(int tx, int ty, Level level) {
+        super(tx, ty, WATER_ID, null, level);
     }
 
     public void setSprite() {
