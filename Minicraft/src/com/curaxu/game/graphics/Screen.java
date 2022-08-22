@@ -65,6 +65,20 @@ public class Screen {
         }
     }
 
+    public void renderLight(Vector pos, int colour, int radius) {
+        for (int yy = -radius; yy <= radius; yy++) {
+            int yp = (int) (pos.getY() + yy);
+            for (int xx = -radius; xx <= radius; xx++) {
+                int xp = (int) (pos.getX() + xx);
+                double distFromCenter = pos.sub(new Vector(xp, yp)).length();
+                if (distFromCenter < radius && inBounds(xp, yp)) {
+                    int c = ((int) (255 * (1.0 - distFromCenter / radius)) << 24) | (colour & 0xffffff);
+                    setPixel(xp + yp * width, c);
+                }
+            }
+        }
+    }
+
     public boolean inBounds(int xp, int yp) {
         return xp >= 0 && yp >= 0 && xp < width && yp < height;
     }
@@ -78,7 +92,6 @@ public class Screen {
             setPixel(i, colour | 0xff000000);
         }
     }
-
 
     public void setOffset(Vector v) {
         offset = new Vector(v);

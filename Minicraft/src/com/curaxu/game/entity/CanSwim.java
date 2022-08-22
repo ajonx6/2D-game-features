@@ -16,7 +16,7 @@ public class CanSwim extends Component {
     }
 
     public void tick(double delta) {
-        if (entity.standing != null && entity.standing.getID() == Tile.WATER_ID) {
+        if (entity.tileIDunderneath == Tile.WATER.getId()) {
             sprites.setIndex(1);
             canMove.setMoveSpeed(swimSpeed);
         } else {

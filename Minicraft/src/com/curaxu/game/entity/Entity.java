@@ -13,7 +13,7 @@ public class Entity {
     protected Vector centerWorldPos;
     protected Vector screenPos;
     protected String tag;
-    protected Tile standing;
+    protected int tileIDunderneath;
     protected List<Component> components = new ArrayList<>();
 
     public Entity(int worldX, int worldY, String tag) {
@@ -31,7 +31,7 @@ public class Entity {
     }
 
     public void tick(double delta) {
-        standing = Game.getInstance().getLevel().getTileAtWorldPos(centerWorldPos);
+        tileIDunderneath = Game.getInstance().getLevel().getTileIDAtWorldPos(centerWorldPos);
 
         for (Component c : components) {
             c.tick(delta);
@@ -77,7 +77,7 @@ public class Entity {
         return tag;
     }
 
-    public Tile getStanding() {
-        return standing;
+    public int getStanding() {
+        return tileIDunderneath;
     }
 }

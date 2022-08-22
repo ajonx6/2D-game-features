@@ -4,10 +4,10 @@ import com.curaxu.game.Vector;
 
 public class Collisions {
     public static boolean collisionWithBox(AABBBox a, AABBBox b) {
-        boolean collision = a.getPosition().getX() < b.getPosition().getX() + b.getWidth()  &&
-            a.getPosition().getX() + a.getWidth() > b.getPosition().getX()  &&
-            a.getPosition().getY() < b.getPosition().getY() + b.getHeight() &&
-            a.getPosition().getY() + a.getHeight() > b.getPosition().getY();
+        boolean collision = a.getOffsetPosition().getX() < b.getOffsetPosition().getX() + b.getWidth()  &&
+            a.getOffsetPosition().getX() + a.getWidth() > b.getOffsetPosition().getX()  &&
+            a.getOffsetPosition().getY() < b.getOffsetPosition().getY() + b.getHeight() &&
+            a.getOffsetPosition().getY() + a.getHeight() > b.getOffsetPosition().getY();
         return collision;
     }
 

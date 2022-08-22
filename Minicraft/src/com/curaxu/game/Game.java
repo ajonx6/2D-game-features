@@ -2,12 +2,9 @@ package com.curaxu.game;
 
 import java.awt.Canvas;
 import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.util.List;
 import java.util.Random;
 
 import javax.swing.JFrame;
@@ -30,8 +27,8 @@ public class Game extends Canvas implements Runnable {
 	public static final int PIXEL_WIDTH = SCREEN_WIDTH / SCALE;
 	public static final int PIXEL_HEIGHT = SCREEN_HEIGHT / SCALE;
 	public static final String TITLE = "Minicraft";
-	public static final double FPS = 120.0;
-	public static final int TILE_SIZE = 16;
+	public static final double FPS = 300.0;
+	public static final int TILE_SIZE = 32;
 
 	private static Game instance;
 
@@ -48,62 +45,30 @@ public class Game extends Canvas implements Runnable {
 	private ParticleSystem ps2;
 	private ParticleSystem ps3;
 
-	private Game() {
-		screen = new Screen(PIXEL_WIDTH, PIXEL_HEIGHT);
-		level = new Level(128, 72);
-		player = new Entity(16, 16, "player");
-		player.addComponent(new SpriteList(player, new Sprite(
-			SpriteSheets.tile_sheet.getSprite(4, 0, 1, 1),
-			0xFF331D1A, 0XFF456D9E, 0XFFFFD8EF, 0), new Sprite(
-			SpriteSheets.tile_sheet.getSprite(5, 0, 1, 1),
-			0XFF331D1A, 0XFF456D9E, 0XFFFFD8EF, 0XFF93D2F9)));
-		player.addComponent(new AABBBox(player, player.getWorldPos(), Game.TILE_SIZE, Game.TILE_SIZE));
-		player.addComponent(new CanMove(player, 75));
-		player.addComponent(new CanSwim(player, 40));
-		player.addComponent(new PlayerControl(player));
-		player.addComponent(new Camera(player, true));
-		player.addComponent(new CollisionResolve(player, "tree") {
-			public void onCollision() {
-				List<Entity> collided = level.getSurroundingTileCollisions(this.entity.getStanding(), this.getTag(), this.getAABBBox());
-				if (collided.size() > 0) this.getAABBBox().collided();
-				for (Entity e : collided) {
-					((AABBBox) e.getComponent("AABBBox")).collided();
-				}
-			}
-		});
-		level.addEntity(player);
-
-		int[] shirtcols = new int[] {0XFF456D9E, 0xFFA02945, 0XFF597238, 0XFFE4A55A};
-		for (int i = 0; i < 1; i++) {
-			int c = shirtcols[random.nextInt(shirtcols.length)];
-			Entity test = new Entity(random.nextInt(PIXEL_WIDTH), random.nextInt(PIXEL_HEIGHT), "test");
-			test.addComponent(new SpriteList(test, new Sprite(
-				SpriteSheets.tile_sheet.getSprite(4, 0, 1, 1),
-				0xFF331D1A, c, 0XFFFFD8EF, 0), new Sprite(
-				SpriteSheets.tile_sheet.getSprite(5, 0, 1, 1),
-				0xFF331D1A, c, 0XFFFFD8EF, 0XFF93D2F9)));
-			test.addComponent(new AABBBox(test, test.getWorldPos(), Game.TILE_SIZE, Game.TILE_SIZE));
-			test.addComponent(new CanMove(test, 60));
-			test.addComponent(new CanSwim(test, 30));
-			test.addComponent(new RandomWalk(test));
-			// test.addComponent(new Camera(test, true));
-			// test.addComponent(new MoveTowards(test, player));
-			test.addComponent(new Camera(test, false));
-			level.addEntity(test);
-		}
-
-		// ps1 = new ParticleSystem(new Vector(100, 100), 60, new Particle(null, 2, 0xFF444444, 2, null, 0, 2, false));
-		// ps2 = new ParticleSystem(new Vector(50, 50), 70, new Particle(null, 2, 0xFFFF00FF, 2, null, 0.1, 2, false));
-		// ps3 = new ParticleSystem(new Vector(50, 50), 50, new Particle(null, 2, 0xFF72DDE5, 2, null, 0.3, 2, false));
-
-
-		addKeyListener(new KeyInput());
-		addMouseListener(new MouseInput());
-	}
+	private Game() {}
 
 	public static Game getInstance() {
 		if (instance == null) instance = new Game();
 		return instance;
+	}
+
+	public void init() {
+		screen = new Screen(PIXEL_WIDTH, PIXEL_HEIGHT);
+		level = new Level(128, 72);
+
+		player = EntityGenerator.createPlayer(new Vector());
+		level.addEntity(player);
+
+		for (int i = 0; i < 100; i++) {
+			level.addEntity(EntityGenerator.createNPC(new Vector(random.nextInt(PIXEL_WIDTH), random.nextInt(PIXEL_HEIGHT))));
+		}
+
+		ps1 = new ParticleSystem(new Vector(100, 100), 60, new Particle(null, 2, 0xFF444444, 2, null, 0, 2, false));
+		ps2 = new ParticleSystem(new Vector(50, 50), 70, new Particle(null, 2, 0xFFFF00FF, 2, null, 0.1, 2, false));
+		ps3 = new ParticleSystem(new Vector(50, 50), 50, new Particle(null, 2, 0xFF72DDE5, 2, null, 0.3, 2, false));
+
+		addKeyListener(new KeyInput());
+		addMouseListener(new MouseInput());
 	}
 
 	public void stop() {
@@ -164,15 +129,17 @@ public class Game extends Canvas implements Runnable {
 
 		// if (MouseInput.wasPressed(MouseEvent.BUTTON1)) {
 		// 	Camera.activeCamera.deactivate();
-		// 	((Camera) level.getEntities().get(random.nextInt(level.getEntities().size())).getComponent("Camera")).activate();
+		// 	List<Entity> e = level.getEntities("test");
+		// 	((Camera) e.get(random.nextInt(e.size())).getComponent("Camera")).activate();
 		// }
 
 		KeyInput.tick();
 		MouseInput.tick();
 		level.tick(delta);
-		// ps1.tick(delta);
-		// ps2.tick(delta);
-		// ps3.tick(delta);
+
+//		ps1.tick(delta);
+//		ps2.tick(delta);
+//		ps3.tick(delta);
 	}
 
 	public void render() {
@@ -185,9 +152,9 @@ public class Game extends Canvas implements Runnable {
 		screen.clear();
 
 		level.render(screen);
-		// ps1.render(screen);
-		// ps2.render(screen);
-		// ps3.render(screen);
+//		ps1.render(screen);
+//		ps2.render(screen);
+//		ps3.render(screen);
 		player.render(screen);
 
 		int[] ps = screen.getPixels();

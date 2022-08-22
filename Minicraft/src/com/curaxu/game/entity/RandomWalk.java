@@ -10,7 +10,6 @@ import java.awt.event.KeyEvent;
 
 public class RandomWalk extends Component {
     private CanMove move;
-    private double dx, dy;
     private Timer timer;
 
     public RandomWalk(Entity entity) {
@@ -23,19 +22,12 @@ public class RandomWalk extends Component {
         return 0.2 + Game.getInstance().getRandom().nextDouble();
     }
 
-    public void move(double delta) {
-        double movespeed = move.getCurrentSpeed();
-        entity.worldPos = entity.worldPos.add(new Vector(dx, dy).mul(movespeed).mul(delta));
-    }
-
     public void tick(double delta) {
         if (timer.tick(delta)) {
             timer.setTime(generateTime());
-            dx = Game.getInstance().getRandom().nextDouble() * 2 - 1;
-            dy = Game.getInstance().getRandom().nextDouble() * 2 - 1;
+            move.setDx(Game.getInstance().getRandom().nextDouble() * 2 - 1);
+            move.setDy(Game.getInstance().getRandom().nextDouble() * 2 - 1);
         }
-
-        move(delta);
     }
 
     public void render(Screen screen) {}

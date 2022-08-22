@@ -26,6 +26,20 @@ public class Sprite {
         }
     }
 
+    public Sprite(GrayscaleSprite sprite, int[] colors) {
+        int[] ps = sprite.getPixels();
+        this.sprite = sprite;
+        this.pixels = new int[ps.length];
+
+        for (int i = 0; i < ps.length; i++) {
+            if (ps[i] == COLOR0) pixels[i] = 0x0;
+            else if (ps[i] == COLOR1) pixels[i] = colors[0];
+            else if (ps[i] == COLOR2) pixels[i] = colors[1];
+            else if (ps[i] == COLOR3) pixels[i] = colors[2];
+            else if (ps[i] == COLOR4) pixels[i] = colors[3];
+        }
+    }
+
     public Sprite(Sprite sprite) {
         this.sprite = sprite.getGrayscaleSprite();
         this.pixels = new int[sprite.getPixels().length];

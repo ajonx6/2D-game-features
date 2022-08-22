@@ -24,6 +24,10 @@ public class SpriteSheet {
         }
     }
 
+    public GrayscaleSprite getSprite(int i, int w, int h) {
+        return getSprite(i % (width / Game.TILE_SIZE), i / (width / Game.TILE_SIZE), w, h);
+    }
+
     public GrayscaleSprite getSprite(int x, int y, int w, int h) {
         int[] pixels = new int[w * Game.TILE_SIZE * h * Game.TILE_SIZE];
 
