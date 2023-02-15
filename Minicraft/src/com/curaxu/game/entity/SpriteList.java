@@ -27,6 +27,10 @@ public class SpriteList extends Component {
         this.index = index;
     }
 
+    public Sprite[] getSprites() {
+        return sprites;
+    }
+
     public String getName() {
         return "SpriteList";
     }

@@ -24,11 +24,11 @@ public class SpriteSheet {
         }
     }
 
-    public GrayscaleSprite getSprite(int i, int w, int h) {
-        return getSprite(i % (width / Game.TILE_SIZE), i / (width / Game.TILE_SIZE), w, h);
+    public GrayscaleSprite getGraySprite(int i, int w, int h) {
+        return getGraySprite(i % (width / Game.TILE_SIZE), i / (width / Game.TILE_SIZE), w, h);
     }
 
-    public GrayscaleSprite getSprite(int x, int y, int w, int h) {
+    public GrayscaleSprite getGraySprite(int x, int y, int w, int h) {
         int[] pixels = new int[w * Game.TILE_SIZE * h * Game.TILE_SIZE];
 
         for (int yy = 0; yy < h * Game.TILE_SIZE; yy++) {
@@ -40,5 +40,27 @@ public class SpriteSheet {
         }
 
         return new GrayscaleSprite(pixels, w * Game.TILE_SIZE, h * Game.TILE_SIZE);
+    }
+
+    public Sprite getSprite(int i, int w, int h) {
+        return getSprite(i % (width / Game.TILE_SIZE), i / (width / Game.TILE_SIZE), w, h);
+    }
+
+    public Sprite getSprite(int x, int y, int w, int h) {
+        int[] pixels = new int[w * Game.TILE_SIZE * h * Game.TILE_SIZE];
+
+        for (int yy = 0; yy < h * Game.TILE_SIZE; yy++) {
+            int yp = y * Game.TILE_SIZE + yy;
+            for (int xx = 0; xx < w * Game.TILE_SIZE; xx++) {
+                int xp = x * Game.TILE_SIZE + xx;
+                pixels[xx + yy * w * Game.TILE_SIZE] = this.pixels[xp + yp * width];
+            }
+        }
+
+        return new Sprite(w * Game.TILE_SIZE, h * Game.TILE_SIZE, pixels);
+    }
+
+    public int getWidth() {
+        return width;
     }
 }

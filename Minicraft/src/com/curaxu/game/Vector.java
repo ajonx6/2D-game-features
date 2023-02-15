@@ -46,11 +46,7 @@ public class Vector {
     }
 
     public Vector add(double r) {
-        return add(r, r);
-    }
-
-    public Vector add(double r, double s) {
-        return new Vector(x + r, y + s);
+        return new Vector(x + r, y + r);
     }
 
     public Vector sub(Vector v) {
@@ -58,11 +54,7 @@ public class Vector {
     }
 
     public Vector sub(double r) {
-        return sub(r, r);
-    }
-
-    public Vector sub(double r, double s) {
-        return new Vector(x - r, y - s);
+        return new Vector(x - r, y - r);
     }
 
     public Vector mul(Vector v) {
@@ -70,11 +62,7 @@ public class Vector {
     }
 
     public Vector mul(double r) {
-        return mul(r, r);
-    }
-
-    public Vector mul(double r, double s) {
-        return new Vector(x * r, y * s);
+        return new Vector(x * r, y * r);
     }
 
     public Vector div(Vector v) {
@@ -82,11 +70,7 @@ public class Vector {
     }
 
     public Vector div(double r) {
-        return div(r, r);
-    }
-
-    public Vector div(double r, double s) {
-        return new Vector(x / r, y / s);
+        return new Vector(x / r, y / r);
     }
 
     public boolean equals(Vector v) {

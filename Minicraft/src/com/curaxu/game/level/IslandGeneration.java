@@ -10,7 +10,7 @@ public class IslandGeneration {
     private double trueProbs;
 
     private int numIterations = 1;
-    private Random random = new Random();
+    private Random random = new Random(100);
 
     public IslandGeneration(int width, int height, double trueProbs) {
         this.width = width;

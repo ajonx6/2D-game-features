@@ -24,4 +24,8 @@ public class GrayscaleSprite {
     public int[] getPixels() {
         return pixels;
     }
+
+    public Sprite coloured(int[] colors) {
+        return new Sprite(this, colors[0], colors[1], colors[2], colors[3]);
+    }
 }

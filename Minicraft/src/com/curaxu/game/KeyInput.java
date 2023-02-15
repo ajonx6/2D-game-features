@@ -25,6 +25,7 @@ public class KeyInput extends KeyAdapter {
 	}
 
 	public void keyReleased(KeyEvent e) {
+		if (e.getKeyCode() >= keys.length) return;
 		keys[e.getKeyCode()] = false;
 	}
 

@@ -24,7 +24,8 @@ public class ParticleSystem {
     public void tick(double delta) {
         if (time >= particleSpawnTime) {
             time -= particleSpawnTime;
-            Vector direction = new Vector(Game.getInstance().getRandom().nextDouble() * 5.0 - 2.5, Game.getInstance().getRandom().nextDouble() * 5.0 - 2.5);
+            Vector direction = new Vector(Game.getInstance().getRandom().nextDouble() * 2.0 - 1.0, Game.getInstance().getRandom().nextDouble() * 2.0 - 1.0);
+            direction = direction.normalize();
             particles.add(new Particle(worldPos, t.getSize(), t.getColour(), t.getSpeed(), direction, t.getDeceleration(), t.getLife(), t.doesLifeDeterminesAlpha()));
         } else {
             time += delta;

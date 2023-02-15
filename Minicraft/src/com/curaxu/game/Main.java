@@ -20,7 +20,6 @@ public class Main {
 		game.frame.setLocationRelativeTo(null);
 		game.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		game.frame.setVisible(true);
-		game.init();
 
 		pool.runTask(new SoundManager());
 		pool.runTask(game);

@@ -1,44 +1,103 @@
 package com.curaxu.game.level;
 
-import com.curaxu.game.graphics.SpriteSheets;
-import com.curaxu.game.graphics.Sprite;
+import com.curaxu.game.graphics.*;
+import com.curaxu.game.Game;
 
-import java.util.HashMap;
-
-public class Tile {
-    public static final int NUM_SPRITES_PER_TILE = 16;
-    public static final Tile GRASS = new Tile(1, 0, 0XFF337A45, 0XFF6DB767, 0xFF2B5636, 0);
-    public static final Tile WATER = new Tile(2, 1, 0XFF3784B5, 0XFF6996B2, 0xFF54788E, 0);
-
-    private static HashMap<Integer, Tile> TILES;
+public enum Tile {
+    GRASS(1, 8, 0XFF337A45, 0XFF6DB767, 0xFF2B5636, 0),
+    WATER(2, 12, 0XFF3784B5, 0XFF6996B2, 0xFF54788E, 0);
 
     private int id;
-    private int[] colors;
-    private Sprite[] sprites = new Sprite[NUM_SPRITES_PER_TILE];
+    private int spritesheetX, spritesheetY, spritesheetI;
+    private GrayscaleSprite[] grayscaleSprites;
+    private Sprite[] sprites;
 
-    Tile(int id, int y, int... colors) {
+    private int[] colors;
+
+    Tile(int id, int spritesheetI, int c1, int c2, int c3, int c4) {
         this.id = id;
-        this.colors = colors;
-        for (int x = 0; x < NUM_SPRITES_PER_TILE; x++) {
-            sprites[x] = new Sprite(SpriteSheets.tiles_sheet.getSprite(x, y, 1, 1), colors);
-        }
-        if (TILES == null) TILES = new HashMap<Integer, Tile>();
-        TILES.put(id, this);
+        this.spritesheetX = spritesheetI % SpriteSheets.black_white_sprites.getWidth();
+        this.spritesheetY = spritesheetI / SpriteSheets.black_white_sprites.getWidth();
+        this.spritesheetI = spritesheetI;
+
+        this.grayscaleSprites = new GrayscaleSprite[16];
+        this.sprites = new Sprite[16];
+        int index = 0;
+        grayscaleSprites[index] = SpriteSheets.black_white_sprites.getGraySprite(spritesheetI + 1 + 1 * SpriteSheets.black_white_sprites.getWidth() / Game.TILE_SIZE, 1, 1);//1 1
+        sprites[index] = new Sprite(grayscaleSprites[index++], c1, c2, c3, c4);
+        grayscaleSprites[index] = SpriteSheets.black_white_sprites.getGraySprite(spritesheetI + 2 + 1 * SpriteSheets.black_white_sprites.getWidth() / Game.TILE_SIZE, 1, 1);//1 1
+        sprites[index] = new Sprite(grayscaleSprites[index++], c1, c2, c3, c4);
+        grayscaleSprites[index] = SpriteSheets.black_white_sprites.getGraySprite(spritesheetI + 0 + 1 * SpriteSheets.black_white_sprites.getWidth() / Game.TILE_SIZE, 1, 1);//1 1
+        sprites[index] = new Sprite(grayscaleSprites[index++], c1, c2, c3, c4);
+        grayscaleSprites[index] = SpriteSheets.black_white_sprites.getGraySprite(spritesheetI + 1 + 3 * SpriteSheets.black_white_sprites.getWidth() / Game.TILE_SIZE, 1, 1);//1 1
+        sprites[index] = new Sprite(grayscaleSprites[index++], c1, c2, c3, c4);
+
+        grayscaleSprites[index] = SpriteSheets.black_white_sprites.getGraySprite(spritesheetI + 1 + 2 * SpriteSheets.black_white_sprites.getWidth() / Game.TILE_SIZE, 1, 1);//1 1
+        sprites[index] = new Sprite(grayscaleSprites[index++], c1, c2, c3, c4);
+        grayscaleSprites[index] = SpriteSheets.black_white_sprites.getGraySprite(spritesheetI + 2 + 2 * SpriteSheets.black_white_sprites.getWidth() / Game.TILE_SIZE, 1, 1);//1 1
+        sprites[index] = new Sprite(grayscaleSprites[index++], c1, c2, c3, c4);
+        grayscaleSprites[index] = SpriteSheets.black_white_sprites.getGraySprite(spritesheetI + 0 + 2 * SpriteSheets.black_white_sprites.getWidth() / Game.TILE_SIZE, 1, 1);//1 1
+        sprites[index] = new Sprite(grayscaleSprites[index++], c1, c2, c3, c4);
+        grayscaleSprites[index] = SpriteSheets.black_white_sprites.getGraySprite(spritesheetI + 3 + 0 * SpriteSheets.black_white_sprites.getWidth() / Game.TILE_SIZE, 1, 1);//1 1
+        sprites[index] = new Sprite(grayscaleSprites[index++], c1, c2, c3, c4);
+
+        grayscaleSprites[index] = SpriteSheets.black_white_sprites.getGraySprite(spritesheetI + 1 + 0 * SpriteSheets.black_white_sprites.getWidth() / Game.TILE_SIZE, 1, 1);//1 1
+        sprites[index] = new Sprite(grayscaleSprites[index++], c1, c2, c3, c4);
+        grayscaleSprites[index] = SpriteSheets.black_white_sprites.getGraySprite(spritesheetI + 2 + 0 * SpriteSheets.black_white_sprites.getWidth() / Game.TILE_SIZE, 1, 1);//1 1
+        sprites[index] = new Sprite(grayscaleSprites[index++], c1, c2, c3, c4);
+        grayscaleSprites[index] = SpriteSheets.black_white_sprites.getGraySprite(spritesheetI + 0 + 0 * SpriteSheets.black_white_sprites.getWidth() / Game.TILE_SIZE, 1, 1);//1 1
+        sprites[index] = new Sprite(grayscaleSprites[index++], c1, c2, c3, c4);
+        grayscaleSprites[index] = SpriteSheets.black_white_sprites.getGraySprite(spritesheetI + 3 + 1 * SpriteSheets.black_white_sprites.getWidth() / Game.TILE_SIZE, 1, 1);//1 1
+        sprites[index] = new Sprite(grayscaleSprites[index++], c1, c2, c3, c4);
+
+        grayscaleSprites[index] = SpriteSheets.black_white_sprites.getGraySprite(spritesheetI + 2 + 3 * SpriteSheets.black_white_sprites.getWidth() / Game.TILE_SIZE, 1, 1);//1 1
+        sprites[index] = new Sprite(grayscaleSprites[index++], c1, c2, c3, c4);
+        grayscaleSprites[index] = SpriteSheets.black_white_sprites.getGraySprite(spritesheetI + 3 + 2 * SpriteSheets.black_white_sprites.getWidth() / Game.TILE_SIZE, 1, 1);//1 1
+        sprites[index] = new Sprite(grayscaleSprites[index++], c1, c2, c3, c4);
+        grayscaleSprites[index] = SpriteSheets.black_white_sprites.getGraySprite(spritesheetI + 3 + 3 * SpriteSheets.black_white_sprites.getWidth() / Game.TILE_SIZE, 1, 1);//1 1
+        sprites[index] = new Sprite(grayscaleSprites[index++], c1, c2, c3, c4);
+        grayscaleSprites[index] = SpriteSheets.black_white_sprites.getGraySprite(spritesheetI + 0 + 3 * SpriteSheets.black_white_sprites.getWidth() / Game.TILE_SIZE, 1, 1);//1 1
+        sprites[index] = new Sprite(grayscaleSprites[index], c1, c2, c3, c4);
+
+        this.colors = new int[]{c1, c2, c3, c4};
     }
 
-    public static Tile getTile(int id) {
-        return TILES.get(id);
+    public static int[] getSheetPosFromID(int id) {
+        return new int[] { values()[id].getSpritesheetX(), values()[id].getSpritesheetY()};
+    }
+
+    public static Tile getTileByID(int tileID) {
+        for (Tile t : values()) {
+            if (t.getId() == tileID) return t;
+        }
+        return null;
     }
 
     public int getId() {
         return id;
     }
 
+    public int getSpritesheetX() {
+        return spritesheetX;
+    }
+
+    public int getSpritesheetY() {
+        return spritesheetY;
+    }
+
+    public int getSpritesheetI() {
+        return spritesheetI;
+    }
+
     public int[] getColors() {
         return colors;
     }
 
-    public Sprite getSpriteAtIndex(int i) {
-        return sprites[i];
+    public GrayscaleSprite[] getGrayscaleSprites() {
+        return grayscaleSprites;
+    }
+
+    public Sprite[] getSprites() {
+        return sprites;
     }
 }

@@ -35,9 +35,11 @@ public class Particle {
         speed -= deceleration * delta;
         if (speed < 0) speed = 0;
         alive += delta;
-        double percentage = alive / life;
-        int alpha = (int) (255.0 * (1.0 - percentage));
-        colour = (alpha << 24) | (colour & 0xffffff);
+        if (lifeDeterminesAlpha) {
+            double percentage = alive / life;
+            int alpha = (int) (255.0 * (1.0 - percentage));
+            colour = (alpha << 24) | (colour & 0xffffff);
+        }
         return alive >= life;
     }
 
