@@ -2,7 +2,7 @@ package com.curaxu.game.util;
 
 public class Timer {
 	private double timer;
-	private double ticks = 0;
+	private double time = 0;
 	private boolean loop;
 
 	public Timer(double timer, boolean loop) {
@@ -10,21 +10,29 @@ public class Timer {
 		this.loop = false;
 	}
 
-	public boolean tick(double delta) {
-		if (ticks >= timer) {
-			if (loop) ticks = 0;
+	public boolean tick(double delta) {		
+		if (time >= timer) {
+			if (loop) time = 0;
 			return true;
 		}
-		ticks += delta;
+		time += delta;
 		return false;
 	}
 
 	public double percent() {
-		return ticks / timer;
+		return time / timer;
 	}
 
-	public void setTime(double time) {
-		this.timer = time;
-		this.ticks = 0;
+	public void setTimeLength(double timeLength) {
+		this.timer = timeLength;
+		this.time = 0;
+	}
+	
+	public void setCurrTime(double time) {
+		this.time = time;
+	}
+
+	public double getTimer() {
+		return timer;
 	}
 }

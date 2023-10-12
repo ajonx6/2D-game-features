@@ -12,7 +12,7 @@ public class Main {
 
 		Game game = Game.getInstance();
 		game.frame = new JFrame(Game.TITLE);
-		// game.frame.setUndecorated(true);
+		game.frame.setUndecorated(true);
 		game.frame.add(game);
 		game.frame.pack();
 		game.frame.setSize(Game.SCREEN_WIDTH, Game.SCREEN_HEIGHT);

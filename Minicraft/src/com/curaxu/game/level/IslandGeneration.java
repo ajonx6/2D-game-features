@@ -3,7 +3,7 @@ package com.curaxu.game.level;
 import java.util.Random;
 
 public class IslandGeneration {
-    private static final int MAX_ITERATIONS = 10;
+    private static final int MAX_ITERATIONS = 100;
 
     private int width, height;
     private boolean[] cells;

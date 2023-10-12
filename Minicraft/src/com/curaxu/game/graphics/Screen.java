@@ -2,6 +2,7 @@ package com.curaxu.game.graphics;
 
 import com.curaxu.game.Game;
 import com.curaxu.game.Vector;
+import disused.GrayscaleSprite;
 
 public class Screen {
     private Vector offset = new Vector();
@@ -41,38 +42,30 @@ public class Screen {
         }
     }
 
-    public void renderGraySprite(Vector pos, GrayscaleSprite sprite) {
+    public void renderSprite(Vector pos, AbstractSprite sprite) {
         int[] pixels = sprite.getPixels();
-        for (int yy = 0; yy < Game.TILE_SIZE; yy++) {
+        for (int yy = 0; yy < sprite.getHeight(); yy++) {
             int yp = (int) (pos.getY() + yy);
-            for (int xx = 0; xx < Game.TILE_SIZE; xx++) {
-                int xp = (int) (pos.getX() + xx);
-                if (inBounds(xp, yp)) setPixel(xp + yp * width, pixels[xx + yy * Game.TILE_SIZE]);
-            }
-        }
-    }
-
-    public void renderSprite(Vector pos, Sprite sprite) {
-        int[] pixels = sprite.getPixels();
-        for (int yy = 0; yy < Game.TILE_SIZE; yy++) {
-            int yp = (int) (pos.getY() + yy);
-            for (int xx = 0; xx < Game.TILE_SIZE; xx++) {
+            for (int xx = 0; xx < sprite.getWidth(); xx++) {
                 int xp = (int) (pos.getX() + xx);
                 if (inBounds(xp, yp)) {
-                    setPixel(xp + yp * width, pixels[xx + yy * Game.TILE_SIZE]);
+                    setPixel(xp + yp * width, pixels[xx + yy * sprite.getWidth()]);
                 }
             }
         }
     }
 
-    public void renderLight(Vector pos, int colour, int radius) {
+    public void renderLight(Vector pos, int colour, int radius, boolean fade) {
         for (int yy = -radius; yy <= radius; yy++) {
             int yp = (int) (pos.getY() + yy);
             for (int xx = -radius; xx <= radius; xx++) {
                 int xp = (int) (pos.getX() + xx);
                 double distFromCenter = pos.sub(new Vector(xp, yp)).length();
                 if (distFromCenter < radius && inBounds(xp, yp)) {
-                    int c = ((int) (255 * (1.0 - distFromCenter / radius)) << 24) | (colour & 0xffffff);
+                    double factor = fade ? (1.0 - distFromCenter / radius) : 1.0;
+                    int oldAlpha = (colour >> 24) & 0xff;
+                    int newAlpha = (int) (factor * (double) oldAlpha);
+                    int c = (newAlpha << 24) | (colour & 0xffffff);
                     setPixel(xp + yp * width, c);
                 }
             }

@@ -1,6 +1,6 @@
 package com.curaxu.game;
 
-import com.curaxu.game.entity.Input;
+import com.curaxu.game.entity.components.Input;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -33,9 +33,10 @@ public class KeyInput extends KeyAdapter {
 		for (int i = 0; i < NUM_KEYS; i++) {
 			if (binds.containsKey(i)) {
 				for (Input in : binds.get(i)) {
-					if (in.getType().equals(Input.Type.ON_PRESSED) && keys[i]) in.action();
-					if (in.getType().equals(Input.Type.ON_DOWN) && keys[i] && !lastKeys[i]) in.action();
-					if (in.getType().equals(Input.Type.ON_UP) && !keys[i] && lastKeys[i]) in.action();
+					if (!in.isEnabled()) continue;
+					if (in.getType().equals(Input.Type.ON_PRESSED) && isDown(i)) in.action();
+					if (in.getType().equals(Input.Type.ON_DOWN) && wasPressed(i)) in.action();
+					if (in.getType().equals(Input.Type.ON_UP) && wasReleased(i)) in.action();
 				}
 			}
 		}

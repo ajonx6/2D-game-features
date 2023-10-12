@@ -7,32 +7,24 @@ import com.curaxu.game.graphics.Screen;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
-public class ParticleSystem {
-    private Vector worldPos;
-    private double particleSpawnTime;
-    private double time;
-    private Particle t;
-    private List<Particle> particles = new ArrayList<>();
+public abstract class ParticleSystem {
+    public static final Random R = new Random();
 
-    public ParticleSystem(Vector worldPos, double pps, Particle template) {
+    protected Vector worldPos;
+    protected double particleSpawnTime;
+    protected double time;
+    protected ParticleBlueprint blueprint;
+    protected List<Particle> particles = new ArrayList<>();
+
+    public ParticleSystem(Vector worldPos, double pps, ParticleBlueprint blueprint) {
         this.worldPos = worldPos;
         this.particleSpawnTime = 1.0 / pps;
-        this.t = template;
+        this.blueprint = blueprint;
     }
 
-    public void tick(double delta) {
-        if (time >= particleSpawnTime) {
-            time -= particleSpawnTime;
-            Vector direction = new Vector(Game.getInstance().getRandom().nextDouble() * 2.0 - 1.0, Game.getInstance().getRandom().nextDouble() * 2.0 - 1.0);
-            direction = direction.normalize();
-            particles.add(new Particle(worldPos, t.getSize(), t.getColour(), t.getSpeed(), direction, t.getDeceleration(), t.getLife(), t.doesLifeDeterminesAlpha()));
-        } else {
-            time += delta;
-        }
-
-        particles.removeIf(p -> p.tick(delta));
-    }
+    public abstract void tick(double delta);
 
     public void render(Screen screen) {
         for (Particle p : particles) {

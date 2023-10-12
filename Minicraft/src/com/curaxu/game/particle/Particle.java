@@ -7,7 +7,7 @@ import com.curaxu.game.graphics.Screen;
 public class Particle {
     private Vector worldPos;
     private Vector screenPos;
-    private int size;
+    private double size;
     private int colour;
     private double speed;
     private Vector direction;
@@ -17,13 +17,13 @@ public class Particle {
 
     private double alive = 0;
 
-    public Particle(Vector worldPos, int size, int colour, double speed, Vector direction, double deceleration, double life, boolean lifeDeterminesAlpha) {
+    public Particle(Vector worldPos, double size, int colour, double speed, double direction, double deceleration, double life, boolean lifeDeterminesAlpha) {
         this.worldPos = new Vector(worldPos);
         this.screenPos = new Vector(worldPos);
         this.size = size;
         this.colour = colour;
         this.speed = speed;
-        this.direction = direction;
+        this.direction = new Vector(Math.sin(Math.toRadians(direction)), -Math.cos(Math.toRadians(direction)));
         this.deceleration = deceleration;
         this.life = life;
         this.lifeDeterminesAlpha = lifeDeterminesAlpha;
@@ -44,7 +44,7 @@ public class Particle {
     }
 
     public void render(Screen screen) {
-        screen.renderRect(screenPos.sub(size / 2.0), size, size, colour);
+        screen.renderRect(screenPos.sub(size / 2.0), (int) size, (int) size, colour);
     }
 
     public Vector getWorldPos() {
@@ -53,33 +53,5 @@ public class Particle {
 
     public Vector getScreenPos() {
         return screenPos;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
-    public int getColour() {
-        return colour;
-    }
-
-    public double getSpeed() {
-        return speed;
-    }
-
-    public Vector getDirection() {
-        return direction;
-    }
-
-    public double getDeceleration() {
-        return deceleration;
-    }
-
-    public double getLife() {
-        return life;
-    }
-
-    public boolean doesLifeDeterminesAlpha() {
-        return lifeDeterminesAlpha;
     }
 }

@@ -48,6 +48,7 @@ public class SoundManager implements Runnable {
 
 	public static void loadAllSounds() {
 		sounds.put("lake", new Sound("lake"));
+		sounds.put("lake", new Sound("lake"));
 		finishedLoading = true;
 	}
 }

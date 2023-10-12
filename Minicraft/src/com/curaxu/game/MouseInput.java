@@ -1,6 +1,6 @@
 package com.curaxu.game;
 
-import com.curaxu.game.entity.Input;
+import com.curaxu.game.entity.components.Input;
 
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -45,8 +45,8 @@ public class MouseInput implements MouseListener, MouseMotionListener, MouseWhee
 			if (binds.containsKey(i)) {
 				for (Input in : binds.get(i)) {
 					if (in.getType().equals(Input.Type.ON_PRESSED) && buttons[i]) in.action();
-					if (in.getType().equals(Input.Type.ON_DOWN) && buttons[i] && !lastButtons[i]) in.action();
-					if (in.getType().equals(Input.Type.ON_UP) && !buttons[i] && lastButtons[i]) in.action();
+					if (in.getType().equals(Input.Type.ON_DOWN) && wasPressed(i)) in.action();
+					if (in.getType().equals(Input.Type.ON_UP) && wasReleased(i)) in.action();
 					if (in.getType().equals(Input.Type.ON_WHEEL) && oldScroll != scroll) in.action();
 				}
 			}

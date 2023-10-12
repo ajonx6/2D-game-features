@@ -2,6 +2,7 @@ package com.curaxu.game.entity;
 
 import com.curaxu.game.Game;
 import com.curaxu.game.Vector;
+import com.curaxu.game.entity.components.Component;
 import com.curaxu.game.graphics.Screen;
 import com.curaxu.game.level.Tile;
 
@@ -9,12 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Entity {
-    protected Vector worldPos;
-    protected Vector centerWorldPos;
-    protected Vector screenPos;
-    protected String tag;
-    protected Tile standing;
-    protected List<Component> components = new ArrayList<>();
+    public Vector worldPos;
+    public Vector centerWorldPos;
+    public Vector screenPos;
+    public String tag;
+    public Tile standing;
+    public List<Component> components = new ArrayList<>();
+    public List<Entity> children = new ArrayList<>();
+    public Entity parent;
 
     public Entity(int worldX, int worldY, String tag) {
         this.worldPos = new Vector(worldX, worldY);
@@ -30,6 +33,11 @@ public class Entity {
         this.tag = tag;
     }
 
+    public void addChild(Entity e) {
+        children.add(e);
+        e.parent = this;
+    }
+    
     public void tick(double delta) {
         standing = Tile.getTileByID(Game.getInstance().getLevel().getTileIDAtWorldPos(centerWorldPos));
 
@@ -37,12 +45,24 @@ public class Entity {
             c.tick(delta);
         }
 
-        screenPos = worldPos.add(Game.getInstance().getScreen().getOffset());
-    }
+        if (parent == null) screenPos = worldPos.add(Game.getInstance().getScreen().getOffset());
 
+        for (Entity e : children) {
+            e.screenPos = screenPos.add(e.worldPos);
+        }
+        
+        for (Entity e : children) {
+            e.tick(delta);
+        }
+    }
+    
     public void render(Screen screen) {
         for (Component c : components) {
             c.render(screen);
+        }
+        
+        for (Entity e : children) {
+            e.render(screen);
         }
     }
 

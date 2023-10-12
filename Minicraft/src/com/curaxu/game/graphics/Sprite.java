@@ -1,31 +1,33 @@
 package com.curaxu.game.graphics;
 
+import disused.GrayscaleSprite;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 
-public class Sprite {
+public class Sprite implements AbstractSprite {
     public static final int COLOR0 = 0xFF000000;
     public static final int COLOR1 = 0xFF444444;
     public static final int COLOR2 = 0xFF888888;
     public static final int COLOR3 = 0xFFCCCCCC;
     public static final int COLOR4 = 0xFFFFFFFF;
 
-    private GrayscaleSprite sprite;
     private int width, height;
     private int[] pixels;
 
-    public Sprite(GrayscaleSprite sprite, int c1, int c2, int c3, int c4) {
-        int[] ps = sprite.getPixels();
-        this.sprite = sprite;
-        this.width = sprite.getWidth();
-        this.height = sprite.getHeight();
-        this.pixels = new int[ps.length];
-
-        for (int i = 0; i < ps.length; i++) {
-            if (ps[i] == COLOR0) pixels[i] = 0x0;
-            else if (ps[i] == COLOR1) pixels[i] = c1;
-            else if (ps[i] == COLOR2) pixels[i] = c2;
-            else if (ps[i] == COLOR3) pixels[i] = c3;
-            else if (ps[i] == COLOR4) pixels[i] = c4;
+    public Sprite(String path) {
+        try {
+            BufferedImage image = ImageIO.read(new File("res/" + path + ".png"));
+            this.width = image.getWidth();
+            this.height = image.getHeight();
+            this.pixels = image.getRGB(0, 0, width, height, null, 0, width);
+        } catch (IOException ioe) {
+            System.err.println("Cannot find image: " + path + ".png");
+            ioe.printStackTrace();
+            System.exit(1);
         }
     }
 
@@ -36,19 +38,25 @@ public class Sprite {
         System.arraycopy(pixels, 0, this.pixels, 0, pixels.length);
     }
 
-    public Sprite(Sprite sprite) {
-        this.sprite = sprite.getGrayscaleSprite();
-        this.pixels = new int[sprite.getPixels().length];
-        System.arraycopy(sprite.getPixels(), 0, pixels, 0, pixels.length);
-    }
-
-    public Sprite(int colour) {
-        pixels = new int[256];
+    public Sprite(int colour, int width, int height) {
+        this.width = width;
+        this.height = height;
+        this.pixels = new int[width * height];
         Arrays.fill(pixels, colour);
     }
+    
+    public Sprite coloured(int c1, int c2, int c3, int c4) {
+        int[] pxs = new int[pixels.length];
 
-    public GrayscaleSprite getGrayscaleSprite() {
-        return sprite;
+        for (int i = 0; i < pxs.length; i++) {
+            if (pixels[i] == COLOR0) pxs[i] = 0x0;
+            else if (pixels[i] == COLOR1) pxs[i] = c1;
+            else if (pixels[i] == COLOR2) pxs[i] = c2;
+            else if (pixels[i] == COLOR3) pxs[i] = c3;
+            else if (pixels[i] == COLOR4) pxs[i] = c4;
+        }
+        
+        return new Sprite(width, height, pxs);
     }
 
     public int getWidth() {
@@ -62,4 +70,12 @@ public class Sprite {
     public int[] getPixels() {
         return pixels;
     }
+
+    public void tick(double delta) {}
+
+    public AbstractSprite copy() {
+        return new Sprite(width, height, pixels);
+    }
+    
+    public void reset() {}
 }
