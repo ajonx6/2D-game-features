@@ -13,6 +13,7 @@ public class Entity {
     public Vector worldPos;
     public Vector centerWorldPos;
     public Vector screenPos;
+    public Vector footPos = new Vector();
     public String tag;
     public Tile standing;
     public List<Component> components = new ArrayList<>();
@@ -39,7 +40,7 @@ public class Entity {
     }
     
     public void tick(double delta) {
-        standing = Tile.getTileByID(Game.getInstance().getLevel().getTileIDAtWorldPos(centerWorldPos));
+        standing = Tile.getTileByID(Game.getInstance().getLevel().getTileIDAtWorldPos(worldPos.add(footPos)));
 
         for (Component c : components) {
             c.tick(delta);
@@ -99,5 +100,9 @@ public class Entity {
 
     public Tile getStanding() {
         return standing;
+    }
+
+    public void setFootPosition(Vector footPos) {
+        this.footPos = footPos;
     }
 }

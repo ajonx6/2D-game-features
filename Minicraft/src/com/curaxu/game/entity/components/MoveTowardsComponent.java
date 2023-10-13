@@ -2,22 +2,20 @@ package com.curaxu.game.entity.components;
 
 import com.curaxu.game.Vector;
 import com.curaxu.game.entity.Entity;
-import com.curaxu.game.entity.components.CanMoveComponent;
-import com.curaxu.game.entity.components.Component;
 import com.curaxu.game.graphics.Screen;
 
 public class MoveTowardsComponent extends Component {
-    private CanMoveComponent move;
+    private MoveComponent move;
     private Entity target;
 
     public MoveTowardsComponent(Entity entity, Entity target) {
-        super(entity, "SpriteList", "CanMove");
-        this.move = (CanMoveComponent) entity.getComponent("CanMove");
+        super(entity, "SpriteList", "Move");
+        this.move = (MoveComponent) entity.getComponent("Move");
         this.target = target;
     }
 
     public void move(double delta, Vector toTarget) {
-        double movespeed = move.getCurrentSpeed();
+        double movespeed = move.getCurrentMoveSpeed();
         entity.worldPos = entity.worldPos.add(toTarget.mul(movespeed).mul(delta));
     }
 

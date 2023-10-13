@@ -1,7 +1,5 @@
 package com.curaxu.game.graphics;
 
-import disused.GrayscaleSprite;
-
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;

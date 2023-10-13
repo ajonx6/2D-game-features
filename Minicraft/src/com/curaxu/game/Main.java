@@ -1,9 +1,8 @@
 package com.curaxu.game;
 
-import javax.swing.JFrame;
-
 import com.curaxu.game.util.ThreadPool;
-import com.curaxu.game.audio.SoundManager;
+
+import javax.swing.*;
 
 public class Main {
 	public static void main(String[] args) {
@@ -21,7 +20,6 @@ public class Main {
 		game.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		game.frame.setVisible(true);
 
-		pool.runTask(new SoundManager());
 		pool.runTask(game);
 		pool.join();
 	}

@@ -1,45 +1,44 @@
 package com.curaxu.game.entity.components;
 
+import com.curaxu.game.Pair;
 import com.curaxu.game.Vector;
 import com.curaxu.game.entity.Entity;
-import com.curaxu.game.entity.components.Component;
 import com.curaxu.game.graphics.AbstractSprite;
-import com.curaxu.game.graphics.Sprite;
 import com.curaxu.game.graphics.Screen;
-import com.curaxu.game.graphics.SpriteSheet;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class SpriteListComponent extends Component {
-    private AbstractSprite[] sprites;
-    private int index = 0;
+    private HashMap<String, AbstractSprite> sprites = new HashMap<>();
+    private AbstractSprite currSprite;
 
-    public SpriteListComponent(Entity entity, AbstractSprite... sprites) {
+    public SpriteListComponent(Entity entity, String initial, Pair<String, AbstractSprite>... sprites) {
         super(entity);
-        this.sprites = new AbstractSprite[sprites.length];
-        System.arraycopy(sprites, 0, this.sprites, 0, sprites.length);
-    }
-
-    public SpriteListComponent(Entity entity, SpriteSheet sheet) {
-        super(entity);
-        this.sprites = new AbstractSprite[sheet.getSprites().length];
-        System.arraycopy(sheet.getSprites(), 0, this.sprites, 0, sprites.length);
+        for (Pair<String, AbstractSprite> p : sprites) {
+            this.sprites.put(p.getKey(), p.getValue());
+        }
+        currSprite = this.sprites.get(initial);
+        entity.setFootPosition(new Vector(currSprite.getWidth() / 2, currSprite.getHeight() - 6));
     }
 
     public void tick(double delta) {
-        entity.setCenterWorldPos(entity.getWorldPos().add(new Vector(sprites[index].getWidth(), sprites[index].getHeight()).div(2)));
-        sprites[index].tick(delta);
+        entity.setCenterWorldPos(entity.getWorldPos().add(new Vector(currSprite.getWidth(), currSprite.getHeight()).div(2)));
+        currSprite.tick(delta);
+        entity.setFootPosition(new Vector(currSprite.getWidth() / 2, currSprite.getHeight() - 6));
     }
     
     public void render(Screen screen) {
-        if (index < 0 || index >= sprites.length) index = 0;
-        screen.renderSprite(entity.getScreenPos(), sprites[index]);
+        screen.renderSprite(entity.getScreenPos(), currSprite);
     }
 
-    public void setIndex(int index) {
-        this.index = index;
+    public void setSprite(String name) {
+        currSprite.reset();
+        currSprite = sprites.get(name);
     }
 
-    public AbstractSprite[] getSprites() {
-        return sprites;
+    public AbstractSprite getCurrentSprite() {
+        return currSprite;
     }
 
     public String getName() {

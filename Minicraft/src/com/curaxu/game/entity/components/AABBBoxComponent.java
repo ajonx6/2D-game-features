@@ -28,7 +28,7 @@ public class AABBBoxComponent extends Component {
         super(entity);
         this.position = position == null ? entity.getScreenPos() : position;
 
-        AbstractSprite sprite = sprites.getSprites()[spriteIndex];
+        AbstractSprite sprite = sprites.getCurrentSprite();
         int up = Integer.MAX_VALUE, down = Integer.MIN_VALUE, left = Integer.MAX_VALUE, right = Integer.MIN_VALUE;
         for (int y = 0; y < sprite.getHeight(); y++) {
             for (int x = 0; x < sprite.getWidth(); x++) {

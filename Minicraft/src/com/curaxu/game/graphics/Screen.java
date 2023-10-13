@@ -1,8 +1,6 @@
 package com.curaxu.game.graphics;
 
-import com.curaxu.game.Game;
 import com.curaxu.game.Vector;
-import disused.GrayscaleSprite;
 
 public class Screen {
     private Vector offset = new Vector();

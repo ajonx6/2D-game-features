@@ -1,6 +1,7 @@
 package com.curaxu.game.items;
 
 import com.curaxu.game.Game;
+import com.curaxu.game.Pair;
 import com.curaxu.game.entity.Entity;
 import com.curaxu.game.entity.components.AABBBoxComponent;
 import com.curaxu.game.entity.components.CollisionResolveComponent;
@@ -68,14 +69,14 @@ public class Item {
     public static Entity createItemEntity(Item item, int x, int y, Game game) {
         item = item.copy();
         Entity itemEntity = new Entity(x, y, "item-" + item.getName().toLowerCase().replace(" ", "-"));
-        itemEntity.addComponent(new SpriteListComponent(itemEntity, item.getSprite()));
+        itemEntity.addComponent(new SpriteListComponent(itemEntity, "-", new Pair<>("-", item.getSprite())));
         itemEntity.addComponent(new ItemComponent(itemEntity, item));
         itemEntity.addComponent(new AABBBoxComponent(itemEntity, null, ((SpriteListComponent) itemEntity.getComponent("SpriteList")), 0));
         itemEntity.addComponent(new CollisionResolveComponent(itemEntity, "player") {
             public void onCollision() {
                 Item item = ((ItemComponent) entity.getComponent("Item")).getItem();
                 item.sprite.reset();
-                boolean successful = game.storage.addItemToStorage(item);
+                boolean successful = game.inventory.addItemToStorage(item);
                 if (successful) game.level.prepareRemove(itemEntity);
             }
         });

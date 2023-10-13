@@ -2,18 +2,16 @@ package com.curaxu.game.entity.components;
 
 import com.curaxu.game.Game;
 import com.curaxu.game.entity.Entity;
-import com.curaxu.game.entity.components.CanMoveComponent;
-import com.curaxu.game.entity.components.Component;
 import com.curaxu.game.graphics.Screen;
 import com.curaxu.game.util.Timer;
 
 public class RandomWalkComponent extends Component {
-    private CanMoveComponent move;
+    private MoveComponent move;
     private Timer timer;
 
     public RandomWalkComponent(Entity entity) {
-        super(entity, "SpriteList", "CanMove");
-        this.move = (CanMoveComponent) entity.getComponent("CanMove");
+        super(entity, "SpriteList", "Move");
+        this.move = (MoveComponent) entity.getComponent("Move");
         this.timer = new Timer(0, false);
     }
 
