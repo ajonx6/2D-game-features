@@ -8,7 +8,7 @@ public class Main {
 	public static void main(String[] args) {
 		ThreadPool pool = new ThreadPool(2);
 		System.out.println("Running on OS: " + System.getProperty("os.name"));
-
+		
 		Game game = Game.getInstance();
 		game.frame = new JFrame(Game.TITLE);
 		game.frame.setUndecorated(true);

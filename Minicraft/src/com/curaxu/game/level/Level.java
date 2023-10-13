@@ -1,6 +1,7 @@
 package com.curaxu.game.level;
 
 import com.curaxu.game.Game;
+import com.curaxu.game.PerlinNoise2D;
 import com.curaxu.game.Vector;
 import com.curaxu.game.entity.Collisions;
 import com.curaxu.game.entity.Entity;
@@ -36,7 +37,8 @@ public class Level {
 		this.tileSpriteIndices = new int[levelWidth * levelHeight];
 		Arrays.fill(tileSpriteIndices, -1);
 
-		generateLevelWithAutomata();
+		generateLevelWithNoise();
+		// generateLevelWithAutomata();
 		generateSpriteIndices();
 		// generateExtras();
 	}
@@ -64,6 +66,16 @@ public class Level {
 		for (int y = 0; y < levelHeight; y++) {
 			for (int x = 0; x < levelWidth; x++) {
 				tileIDs[x + y * levelWidth] = cells[x + y * levelWidth] ? Tile.WATER.getId() : Tile.GRASS.getId();
+			}
+		}
+	}
+
+	public void generateLevelWithNoise() {
+		int[] pixels = PerlinNoise2D.getNoiseImage(levelWidth, levelHeight, random.nextInt());
+
+		for (int y = 0; y < levelHeight; y++) {
+			for (int x = 0; x < levelWidth; x++) {
+				tileIDs[x + y * levelWidth] = ((pixels[x + y * levelWidth] >> 16) & 0xff) < 110 ? Tile.WATER.getId() : Tile.GRASS.getId();
 			}
 		}
 	}
