@@ -30,6 +30,6 @@ public class RandomWalkComponent extends Component {
     public void render(Screen screen) {}
 
     public String getName() {
-        return "PlayerControl";
+        return "RandomWalk";
     }
 }

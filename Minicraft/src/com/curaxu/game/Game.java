@@ -1,18 +1,14 @@
 package com.curaxu.game;
 
+import com.curaxu.game.audio.SoundData;
 import com.curaxu.game.audio.SoundGroup;
+import com.curaxu.game.audio.SoundManager;
 import com.curaxu.game.audio.tracks.CompoundData;
 import com.curaxu.game.audio.tracks.EndingTrack;
 import com.curaxu.game.audio.tracks.LoopTrack;
-import com.curaxu.game.audio.SoundManager;
-import com.curaxu.game.audio.SoundData;
 import com.curaxu.game.audio.tracks.RandomTrack;
 import com.curaxu.game.entity.Entity;
-import com.curaxu.game.entity.components.*;
-import com.curaxu.game.graphics.AnimatedSprite;
 import com.curaxu.game.graphics.Screen;
-import com.curaxu.game.graphics.Sprite;
-import com.curaxu.game.graphics.SpriteSheet;
 import com.curaxu.game.inventory.Storage;
 import com.curaxu.game.items.Item;
 import com.curaxu.game.level.Level;
@@ -20,14 +16,10 @@ import com.curaxu.game.level.Level;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.util.List;
 import java.util.Random;
-
-import static com.curaxu.game.entity.components.Input.Type.*;
 
 public class Game extends Canvas implements Runnable {
 	public static final int SCALE = 2;
@@ -52,17 +44,20 @@ public class Game extends Canvas implements Runnable {
 	public Random random = new Random();
 	public Storage inventory;
 	public CompoundData sound;
-	// public Entity currEntity;
+	public Entity npc;
 
 	private Game() {
 		screen = new Screen(PIXEL_WIDTH, PIXEL_HEIGHT);
 		level = new Level(128, 72);
 
-		inventory = new Storage(6, 3);
-		inventory.setCellItem(0, 0, Item.EMPTY_VIAL, 5);
+		inventory = new Storage(3, 3);
+		// inventory.setCellItem(0, 0, Item.EMPTY_VIAL, 5);
 
 		player = Generator.generatePlayer();
 		level.addEntity(player);
+		npc = Generator.generateNPC();
+		level.addEntity(npc);
+		Item.createItemEntity(Item.EMPTY_VIAL, 200, 200, this);
 
 		sound = new CompoundData(
 				new LoopTrack("stone", "stone"),
@@ -103,13 +98,13 @@ public class Game extends Canvas implements Runnable {
 		double unprocessedTime = 0;
 
 		// SoundManager.request(sound);
-		
+
 		try {
 			Thread.sleep(10);
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
-		
+
 		while (running) {
 			boolean render = false;
 
@@ -160,16 +155,17 @@ public class Game extends Canvas implements Runnable {
 		// 	((InputListenerComponent) currEntity.getComponent("InputListener")).activateAll();
 		// }
 
-		if (KeyInput.wasPressed(KeyEvent.VK_L)) {
-			sound.complete();
-		}
-		if (KeyInput.wasPressed(KeyEvent.VK_N)) {
-			sound.cancel();
-		}
+		// if (KeyInput.wasPressed(KeyEvent.VK_L)) {
+		// 	sound.complete();
+		// }
+		// if (KeyInput.wasPressed(KeyEvent.VK_N)) {
+		// 	sound.cancel();
+		// }
 
 		SoundManager.tick(delta);
 		KeyInput.tick();
 		MouseInput.tick();
+
 		level.tick(delta);
 		level.removeEntities();
 		inventory.tick(delta);
@@ -189,8 +185,8 @@ public class Game extends Canvas implements Runnable {
 
 		int[] ps = screen.getPixels();
 		System.arraycopy(ps, 0, pixels, 0, pixels.length);
-
 		g.drawImage(image, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
+		g.setColor(Color.WHITE);
 		g.dispose();
 		bs.show();
 	}

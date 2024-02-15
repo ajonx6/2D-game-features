@@ -1,5 +1,5 @@
 package com.curaxu.game;
 
 public class Settings {
-    public static boolean debugMode = false;
+	public static boolean debugMode = false;
 }

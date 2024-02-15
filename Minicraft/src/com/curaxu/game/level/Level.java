@@ -3,22 +3,20 @@ package com.curaxu.game.level;
 import com.curaxu.game.Game;
 import com.curaxu.game.PerlinNoise2D;
 import com.curaxu.game.Vector;
+import com.curaxu.game.entity.AABBBox;
 import com.curaxu.game.entity.Collisions;
 import com.curaxu.game.entity.Entity;
 import com.curaxu.game.entity.components.AABBBoxComponent;
-import com.curaxu.game.entity.components.LootComponent;
-import com.curaxu.game.entity.components.SpriteListComponent;
+import com.curaxu.game.entity.components.MoveComponent;
 import com.curaxu.game.graphics.Screen;
-import com.curaxu.game.graphics.SpriteSheets;
-import com.curaxu.game.items.Item;
-import com.curaxu.game.particle.CircleParticleSystem;
-import com.curaxu.game.particle.ParticleBlueprint;
 import com.curaxu.game.particle.ParticleSystem;
+import com.sun.security.jgss.GSSUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 public class Level {
 	private int levelWidth, levelHeight;
@@ -27,6 +25,7 @@ public class Level {
 	private Random random = new Random();
 
 	private List<Entity> entities = new ArrayList<>();
+	private HashMap<String, List<Entity>> entityMap = new HashMap<>();
 	private List<Entity> toRemove = new ArrayList<>();
 	private List<ParticleSystem> particleSystems = new ArrayList<>();
 
@@ -77,6 +76,18 @@ public class Level {
 			for (int x = 0; x < levelWidth; x++) {
 				tileIDs[x + y * levelWidth] = ((pixels[x + y * levelWidth] >> 16) & 0xff) < 110 ? Tile.WATER.getId() : Tile.GRASS.getId();
 			}
+		}
+
+		int[] ps = new int[levelWidth * levelHeight];
+		for (int i = 0; i < tileIDs.length; i++) {
+			ps[i] = tileIDs[i] == Tile.WATER.getId() ? 0x0000ff : 0x00ff00;
+		}
+		BufferedImage img = new BufferedImage(levelWidth, levelHeight, BufferedImage.TYPE_INT_RGB);
+		img.setRGB(0, 0, levelWidth, levelHeight, ps, 0, levelWidth);
+		try {
+			ImageIO.write(img, "PNG", new File("World.png"));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -150,31 +161,63 @@ public class Level {
 		return xx >= -Game.TILE_SIZE && yy >= -Game.TILE_SIZE && xx < Game.PIXEL_WIDTH && yy < Game.PIXEL_HEIGHT;
 	}
 
-	public List<Entity> boxEntityCollisionAll(String tag, int x, int y) {
+	public List<Entity> getCollidedWithPoint(int x, int y, String tag) {
 		List<Entity> cs = new ArrayList<>();
 		for (Entity e : entities) {
 			if (!e.getTag().contains(tag)) continue;
 			AABBBoxComponent b = (AABBBoxComponent) e.getComponent("AABBBox");
-			if (b != null && Collisions.collisionWithPoint(b, new Vector(x, y))) cs.add(e);
-		}
-		return cs;
-	}
-	
-	public List<Entity> boxEntityCollisionAll(String tag, AABBBoxComponent a) {
-		List<Entity> cs = new ArrayList<>();
-		for (Entity e : entities) {
-			if (!e.getTag().contains(tag)) continue;
-			AABBBoxComponent b = (AABBBoxComponent) e.getComponent("AABBBox");
-			if (b != null && Collisions.collisionWithBox(a, b)) cs.add(e);
+			if (b != null && Collisions.PointVsBox(new Vector(x, y), b.getBox())) cs.add(e);
 		}
 		return cs;
 	}
 
-	public Entity boxEntityCollisionFirst(String tag, AABBBoxComponent a) {
-		for (Entity e : entities) {
-			if (!e.getTag().equals(tag)) continue;
-			AABBBoxComponent b = (AABBBoxComponent) e.getComponent("AABBBox");
-			if (b != null && Collisions.collisionWithBox(a, b)) return e;
+	public HashMap<Entity, Collisions.CollisionData> getCollidedWithEntity(Entity e, String tag, boolean dynamic, double delta) {
+		AABBBoxComponent comp1 = (AABBBoxComponent) e.getComponent("AABBBox");
+		if (comp1 == null) return new HashMap<>();
+		AABBBox a = comp1.getBox();
+
+		MoveComponent comp2 = (MoveComponent) e.getComponent("Move");
+		if (dynamic && comp2 == null) return new HashMap<>();
+		Vector velocity = comp2 == null ? new Vector(0, 0) : comp2.getVelocity();
+
+		if (!entityMap.containsKey(tag)) return new HashMap<>();
+		HashMap<Entity, Collisions.CollisionData> collisions = new HashMap<>();
+		for (Entity other : entityMap.get(tag)) {
+			AABBBoxComponent otherBox = (AABBBoxComponent) other.getComponent("AABBBox");
+			if (otherBox == null) continue;
+			if ((!dynamic || velocity.isZero()) && Collisions.BoxVsBox(a, otherBox.getBox()))
+				collisions.put(other, null);
+			if (dynamic && !velocity.isZero()) {
+				Collisions.CollisionData collisionData = Collisions.DynamicBoxVsBox(a, velocity, otherBox.getBox(), delta);
+				if (collisionData != null) collisions.put(other, collisionData);
+			}
+		}
+
+		// System.out.println(dynamic);
+		// System.out.println(collisions);
+		// System.exit(0);
+		return collisions;
+	}
+
+	public List<Entity> getCollidedWithEntity(AABBBoxComponent box, String tag) {
+		if (!entityMap.containsKey(tag)) return new ArrayList<>();
+		List<Entity> collisions = new ArrayList<>();
+		for (Entity item : entityMap.get(tag)) {
+			AABBBoxComponent itemBox = (AABBBoxComponent) item.getComponent("AABBBox");
+			if (Collisions.BoxVsBox(box.getBox(), itemBox.getBox())) collisions.add(item);
+		}
+		return collisions;
+	}
+
+	public Entity getFirstCollidedWithEntity(Entity e, String tag) {
+		return getFirstCollidedWithEntity((AABBBoxComponent) e.getComponent("AABBBox"), tag);
+	}
+
+	public Entity getFirstCollidedWithEntity(AABBBoxComponent eBox, String tag) {
+		if (!entityMap.containsKey(tag)) return null;
+		for (Entity item : entityMap.get(tag)) {
+			AABBBoxComponent itemBox = (AABBBoxComponent) item.getComponent("AABBBox");
+			if (Collisions.BoxVsBox(eBox.getBox(), itemBox.getBox())) return item;
 		}
 		return null;
 	}
@@ -216,16 +259,20 @@ public class Level {
 
 	public void addEntity(Entity e) {
 		entities.add(e);
+		if (!entityMap.containsKey(e.tag)) entityMap.put(e.tag, new ArrayList<>());
+		entityMap.get(e.tag).add(e);
 	}
 
-	public List<Entity> getEntities() {
-		return entities;
+	public void prepareRemove(Entity e) {
+		toRemove.add(e);
 	}
 
-	public List<Entity> getEntities(String name) {
-		List<Entity> res = new ArrayList<>(entities);
-		res.removeIf(e -> !e.getTag().equals(name));
-		return res;
+	public void removeEntities() {
+		for (Entity e : toRemove) {
+			if (entityMap.containsKey(e.tag)) entityMap.get(e.tag).remove(e);
+			entities.remove(e);
+		}
+		toRemove.clear();
 	}
 
 	public int getWidth() {
@@ -234,14 +281,5 @@ public class Level {
 
 	public int getHeight() {
 		return levelHeight;
-	}
-
-	public void prepareRemove(Entity e) {
-		toRemove.add(e);
-	}
-
-	public void removeEntities() {
-		entities.removeAll(toRemove);
-		toRemove.clear();
 	}
 }

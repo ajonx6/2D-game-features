@@ -20,7 +20,7 @@ public class PerlinNoise2D {
 				int b = (int)(noise * 0xFF);
 				int g = b * 0x100;
 				int r = b * 0x10000;
-				int finalValue = r;
+				int finalValue = r & g & b;
 				pixels[x + y * width] = finalValue;
 			}
 		}
