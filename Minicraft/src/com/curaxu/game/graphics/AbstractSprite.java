@@ -1,5 +1,7 @@
 package com.curaxu.game.graphics;
 
+import com.curaxu.game.Vector;
+
 public interface AbstractSprite {
 	void tick(double delta);
 
@@ -9,7 +11,7 @@ public interface AbstractSprite {
 
 	int[] getPixels();
 
-	AbstractSprite copy();
-	
 	void reset();
+
+	AbstractSprite copy();
 }

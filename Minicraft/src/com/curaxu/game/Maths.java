@@ -12,4 +12,8 @@ public class Maths {
 		double top = Math.max(bound1, bound2);
 		return Math.max(bottom, Math.min(value, top));
 	}
+
+	public static int modulus(int a, int b) {
+		return ((a % b) + b) % b;
+	}
 }

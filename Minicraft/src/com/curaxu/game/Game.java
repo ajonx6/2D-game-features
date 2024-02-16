@@ -8,7 +8,10 @@ import com.curaxu.game.audio.tracks.EndingTrack;
 import com.curaxu.game.audio.tracks.LoopTrack;
 import com.curaxu.game.audio.tracks.RandomTrack;
 import com.curaxu.game.entity.Entity;
+import com.curaxu.game.graphics.LayeredSprite;
 import com.curaxu.game.graphics.Screen;
+import com.curaxu.game.graphics.ScrollableSprite;
+import com.curaxu.game.graphics.Sprite;
 import com.curaxu.game.inventory.Storage;
 import com.curaxu.game.items.Item;
 import com.curaxu.game.level.Level;
@@ -19,6 +22,7 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
+import java.util.Arrays;
 import java.util.Random;
 
 public class Game extends Canvas implements Runnable {
@@ -46,14 +50,20 @@ public class Game extends Canvas implements Runnable {
 	public CompoundData sound;
 	public Entity npc;
 
+	// ScrollableSprite sprite = new ScrollableSprite(new Sprite("items/kunai"), 90, 45);
+	// LayeredSprite layered = new LayeredSprite().addLayer(new Sprite("items/kunai"), 255, false).addLayer(new ScrollableSprite(new Sprite("vfx/test"), 33, 60), 100, true);
+	Item kunai = Item.KUNAI;
+
 	private Game() {
 		screen = new Screen(PIXEL_WIDTH, PIXEL_HEIGHT);
 		level = new Level(128, 72);
 
 		inventory = new Storage(3, 3);
-		// inventory.setCellItem(0, 0, Item.EMPTY_VIAL, 5);
+		inventory.setCellItem(0, 0, Item.EMPTY_VIAL, 5);
+		inventory.setCellItem(0, 1, Item.SHINY, 17);
+		inventory.setCellItem(0, 2, kunai, 1);
 
-		player = Generator.generatePlayer();
+		player = Generator.generatePlayer(3, 3);
 		level.addEntity(player);
 		npc = Generator.generateNPC();
 		level.addEntity(npc);
@@ -68,6 +78,7 @@ public class Game extends Canvas implements Runnable {
 		for (int i = 0; i < 20; i++) {
 			if (random.nextBoolean()) level.addEntity(Generator.generateNPC());
 			else level.addEntity(Generator.generateSheep());
+			// level.addEntity(Generator.generateNPC());
 		}
 
 		// ParticleBlueprint pn1 = new ParticleBlueprint().setSize(5).setColors(0x22444444).setSpeed(8).setDirection(0.0, 360.0).setDeceleration(0).setLife(2).lifeDeterminesAlpha();
@@ -161,6 +172,13 @@ public class Game extends Canvas implements Runnable {
 		// if (KeyInput.wasPressed(KeyEvent.VK_N)) {
 		// 	sound.cancel();
 		// }
+
+		if (KeyInput.wasPressed(KeyEvent.VK_E)) {
+			kunai.isEnchanted(!kunai.isEnchanted());
+		}
+		if (KeyInput.wasPressed(KeyEvent.VK_I)) {
+			kunai.isSparkle(!kunai.isSparkle());
+		}
 
 		SoundManager.tick(delta);
 		KeyInput.tick();

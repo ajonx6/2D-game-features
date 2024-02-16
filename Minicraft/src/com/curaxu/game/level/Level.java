@@ -231,11 +231,7 @@ public class Level {
 			p.tick(delta);
 		}
 
-		entities.sort((e1, e2) -> {
-			if (e2.getWorldPos().getY() > e1.getWorldPos().getY()) return -1;
-			if (e1.getWorldPos().getY() > e2.getWorldPos().getY()) return 1;
-			return 0;
-		});
+		entities.sort(Comparator.comparingDouble(e -> e.getWorldFootPos().getY()));
 	}
 
 	public void render(Screen screen) {

@@ -11,27 +11,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Entity {
+	public String name;
+	public String tag;
 	public Vector worldPos;
 	public Vector centerWorldPos;
 	public Vector screenPos;
 	public Vector footPos = new Vector();
-	public String tag;
 	public Tile standing;
 	public List<Component> components = new ArrayList<>();
 	public List<Entity> children = new ArrayList<>();
 	public Entity parent;
 
-	public Entity(int worldX, int worldY, String tag) {
+	public Entity(int worldX, int worldY, String name, String tag) {
 		this.worldPos = new Vector(worldX, worldY);
 		this.centerWorldPos = new Vector(worldX, worldY);
 		this.screenPos = new Vector(worldX, worldY);
+		this.name = name;
 		this.tag = tag;
 	}
 
-	public Entity(Vector worldPos, String tag) {
+	public Entity(Vector worldPos, String name, String tag) {
 		this.worldPos = new Vector(worldPos);
 		this.centerWorldPos = new Vector(worldPos);
 		this.screenPos = new Vector(worldPos);
+		this.name = name;
 		this.tag = tag;
 	}
 
@@ -116,6 +119,10 @@ public class Entity {
 
 	public void setFootPosition(Vector footPos) {
 		this.footPos = footPos;
+	}
+
+	public Vector getWorldFootPos() {
+		return worldPos.add(footPos);
 	}
 
 	public String toString() {

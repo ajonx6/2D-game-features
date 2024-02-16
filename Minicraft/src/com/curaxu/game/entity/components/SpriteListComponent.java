@@ -19,13 +19,13 @@ public class SpriteListComponent extends Component {
             this.sprites.put(p.getKey(), p.getValue());
         }
         currSprite = this.sprites.get(initial);
-        entity.setFootPosition(new Vector(currSprite.getWidth() / 2, currSprite.getHeight() - 6));
+        entity.setFootPosition(new Vector(currSprite.getWidth() / 2, currSprite.getHeight() - 2));
     }
 
     public void tick(double delta) {
         entity.setCenterWorldPos(entity.getWorldPos().add(new Vector(currSprite.getWidth(), currSprite.getHeight()).div(2)));
         currSprite.tick(delta);
-        entity.setFootPosition(new Vector(currSprite.getWidth() / 2, currSprite.getHeight() - 6));
+        entity.setFootPosition(new Vector(currSprite.getWidth() / 2, currSprite.getHeight() - 2));
     }
     
     public void render(Screen screen) {

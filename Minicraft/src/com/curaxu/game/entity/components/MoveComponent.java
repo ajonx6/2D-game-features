@@ -1,5 +1,6 @@
 package com.curaxu.game.entity.components;
 
+import com.curaxu.game.KeyInput;
 import com.curaxu.game.Time;
 import com.curaxu.game.Vector;
 import com.curaxu.game.entity.Entity;
@@ -7,21 +8,27 @@ import com.curaxu.game.graphics.Screen;
 import com.curaxu.game.level.Tile;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 
+import java.awt.event.KeyEvent;
+
 public class MoveComponent extends Component {
 	public static final int IDLE = 0;
 	public static final int WALK = 1;
 	public static final int SWIM = 2;
 
-	private SpriteListComponent sprites;
+	public static final String UP = "up";
+	public static final String DOWN = "down";
+	public static final String LEFT = "left";
+	public static final String RIGHT = "right";
 
+	private boolean playerControls = false;
+	private SpriteListComponent sprites;
+	private boolean canMoveUp = true, canMoveDown = true, canMoveLeft = true, canMoveRight = true;
+	private String dir = RIGHT, prevDir = RIGHT;
+	private int currState = IDLE;
 	private double moveSpeed;
 	private double currentMoveSpeed;
 	private Vector direction = new Vector();
 	private Vector velocity = new Vector();
-
-	private boolean canMoveUp = true, canMoveDown = true, canMoveLeft = true, canMoveRight = true;
-	private String dir = "right", prevDir = "right";
-	private int currState = IDLE;
 
 	private boolean canSwim = false;
 	private double swimSpeed;
@@ -33,24 +40,34 @@ public class MoveComponent extends Component {
 		this.sprites = (SpriteListComponent) entity.getComponent("SpriteList");
 	}
 
-	public MoveComponent canSwim(double swimSpeed) {
-		this.canSwim = true;
-		this.swimSpeed = swimSpeed;
-		return this;
+	private void getPlayerInput() {
+		direction = new Vector();
+		if (KeyInput.isDown(KeyEvent.VK_W)) direction.setY(-1);
+		if (KeyInput.isDown(KeyEvent.VK_S)) direction.setY(direction.getY() + 1);
+		if (KeyInput.isDown(KeyEvent.VK_A)) direction.setX(-1);
+		if (KeyInput.isDown(KeyEvent.VK_D)) direction.setX(direction.getX() + 1);
+		
+		setVelocity();
 	}
 
 	public void move(double delta) {
-		// TODO - CUT OF DIRS IF DIRECTION NOT ALLOWED
 		if (!canMoveUp && direction.getY() < 0) direction.setY(0);
 		if (!canMoveDown && direction.getY() > 0) direction.setY(0);
 		if (!canMoveLeft && direction.getX() < 0) direction.setY(0);
 		if (!canMoveRight && direction.getX() > 0) direction.setY(0);
+
 		entity.worldPos = entity.worldPos.add(velocity);
-		if (direction.getX() < 0) dir = "left";
-		else if (direction.getX() > 0) dir = "right";
+		if (direction.getX() < 0) dir = LEFT;
+		else if (direction.getX() > 0) dir = RIGHT;
+		else {
+			if (direction.getY() < 0) dir = UP;
+			else if (direction.getY() > 0) dir = DOWN;
+		}
 	}
 
 	public void tick(double delta) {
+		if (playerControls) getPlayerInput();
+
 		move(delta);
 		canMoveAllDirs();
 		int tileId = entity.standing == null ? 0 : entity.standing.getId();
@@ -74,6 +91,17 @@ public class MoveComponent extends Component {
 		}
 		prevDir = dir;
 		sprites.getCurrentSprite().tick(delta);
+	}
+
+	public MoveComponent setPlayerControls(boolean playerControls) {
+		this.playerControls = playerControls;
+		return this;
+	}
+
+	public MoveComponent canSwim(double swimSpeed) {
+		this.canSwim = true;
+		this.swimSpeed = swimSpeed;
+		return this;
 	}
 
 	public void canMoveAllDirs() {
@@ -132,7 +160,7 @@ public class MoveComponent extends Component {
 	}
 
 	public void setVelocity() {
-		velocity = direction.mul(currentMoveSpeed).mul(Time.getFrameTimeInSeconds());
+		velocity = direction.normalize().mul(currentMoveSpeed).mul(Time.getFrameTimeInSeconds());
 	}
 
 	public void setVelocity(Vector vel) {
