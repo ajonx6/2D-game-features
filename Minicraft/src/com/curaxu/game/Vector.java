@@ -25,6 +25,11 @@ public class Vector {
 		return x * x + y * y;
 	}
 
+	public double distance(Vector v) {
+		return new Vector(x - v.x, y - v.y).length();
+	}
+
+
 	public double distanceTo(Vector v) {
 		double dx = v.x - x;
 		double dy = v.y - y;

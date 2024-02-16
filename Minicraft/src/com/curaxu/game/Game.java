@@ -19,6 +19,7 @@ import com.curaxu.game.level.Level;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
@@ -48,11 +49,6 @@ public class Game extends Canvas implements Runnable {
 	public Random random = new Random();
 	public Storage inventory;
 	public CompoundData sound;
-	public Entity npc;
-
-	// ScrollableSprite sprite = new ScrollableSprite(new Sprite("items/kunai"), 90, 45);
-	// LayeredSprite layered = new LayeredSprite().addLayer(new Sprite("items/kunai"), 255, false).addLayer(new ScrollableSprite(new Sprite("vfx/test"), 33, 60), 100, true);
-	Item kunai = Item.KUNAI;
 
 	private Game() {
 		screen = new Screen(PIXEL_WIDTH, PIXEL_HEIGHT);
@@ -60,14 +56,13 @@ public class Game extends Canvas implements Runnable {
 
 		inventory = new Storage(3, 3);
 		inventory.setCellItem(0, 0, Item.EMPTY_VIAL, 5);
-		inventory.setCellItem(0, 1, Item.SHINY, 17);
-		inventory.setCellItem(0, 2, kunai, 1);
+		inventory.setCellItem(1, 0, Item.SHINY, 17);
+		inventory.setCellItem(2, 0, Item.KUNAI, 1);
 
 		player = Generator.generatePlayer(3, 3);
 		level.addEntity(player);
-		npc = Generator.generateNPC();
-		level.addEntity(npc);
-		Item.createItemEntity(Item.EMPTY_VIAL, 200, 200, this);
+		// level.addEntity(Generator.generateBloodSplatter());
+		// Item.createItemEntity(Item.EMPTY_VIAL, 200, 200, this);
 
 		sound = new CompoundData(
 				new LoopTrack("stone", "stone"),
@@ -156,6 +151,15 @@ public class Game extends Canvas implements Runnable {
 		double delta = Time.getFrameTimeInSeconds();
 		if (KeyInput.isDown(KeyEvent.VK_ESCAPE)) System.exit(0);
 
+		if (KeyInput.wasPressed(KeyEvent.VK_1)) {
+			inventory.getCell(0, 0).getItem().leftClick(player, level);
+		}
+		if (KeyInput.wasPressed(KeyEvent.VK_2)) {
+			inventory.getCell(1, 0).getItem().leftClick(player, level);
+		}
+		if (KeyInput.wasPressed(KeyEvent.VK_3)) {
+			inventory.getCell(2, 0).getItem().leftClick(player, level);
+		}
 		// if (MouseInput.wasPressed(MouseEvent.BUTTON3)) {
 		// 	CameraComponent.activeCamera.deactivate();
 		// 	List<Entity> e = level.getEntities("test");
@@ -174,10 +178,10 @@ public class Game extends Canvas implements Runnable {
 		// }
 
 		if (KeyInput.wasPressed(KeyEvent.VK_E)) {
-			kunai.isEnchanted(!kunai.isEnchanted());
+			inventory.getCell(2, 0).getItem().isEnchanted(!inventory.getCell(2, 0).getItem().isEnchanted());
 		}
 		if (KeyInput.wasPressed(KeyEvent.VK_I)) {
-			kunai.isSparkle(!kunai.isSparkle());
+			inventory.getCell(2, 0).getItem().isSparkle(!inventory.getCell(2, 0).getItem().isSparkle());
 		}
 
 		SoundManager.tick(delta);

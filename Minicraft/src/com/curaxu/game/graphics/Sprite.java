@@ -59,6 +59,16 @@ public class Sprite implements AbstractSprite {
 		return new Sprite(width, height, pxs);
 	}
 
+	public static Sprite createCircle(int radius, int colour) {
+		int[] pixels = new int[radius * 2 * radius * 2];
+		for (int y = -radius; y < radius; y++) {
+			for (int x = -radius; x < radius; x++) {
+				if (Math.sqrt(x * x + y * y) <= radius) pixels[(x + radius) + (y + radius) * radius * 2] = colour;
+			}
+		}
+		return new Sprite(radius * 2, radius * 2, pixels);
+	}
+
 	public void tick(double delta) {}
 
 	public int getWidth() {

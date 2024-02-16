@@ -21,8 +21,9 @@ public class Entity {
 	public List<Component> components = new ArrayList<>();
 	public List<Entity> children = new ArrayList<>();
 	public Entity parent;
+	public boolean onFloor = false;
 
-	public Entity(int worldX, int worldY, String name, String tag) {
+	public Entity(double worldX, double worldY, String name, String tag) {
 		this.worldPos = new Vector(worldX, worldY);
 		this.centerWorldPos = new Vector(worldX, worldY);
 		this.screenPos = new Vector(worldX, worldY);
@@ -137,5 +138,14 @@ public class Entity {
 				", children=" + children +
 				", parent=" + parent +
 				'}';
+	}
+
+	public Entity onFloor() {
+		onFloor = true;
+		return this;
+	}
+
+	public boolean isOnFloor() {
+		return onFloor;
 	}
 }

@@ -231,7 +231,14 @@ public class Level {
 			p.tick(delta);
 		}
 
-		entities.sort(Comparator.comparingDouble(e -> e.getWorldFootPos().getY()));
+		entities.sort((e1, e2) -> {
+			if (e1.isOnFloor() && e2.isOnFloor())
+				return Double.compare(e1.getWorldFootPos().getY(), e2.getWorldFootPos().getY());
+			else if (e1.isOnFloor() && !e2.isOnFloor()) return -1;
+			else if (!e1.isOnFloor() && e2.isOnFloor()) return 1;
+			else return Double.compare(e1.getWorldFootPos().getY(), e2.getWorldFootPos().getY());
+		});
+		// Comparator.comparingDouble(e -> e.getWorldFootPos().getY()));
 	}
 
 	public void render(Screen screen) {
@@ -257,6 +264,10 @@ public class Level {
 		entities.add(e);
 		if (!entityMap.containsKey(e.tag)) entityMap.put(e.tag, new ArrayList<>());
 		entityMap.get(e.tag).add(e);
+	}
+
+	public List<Entity> getEntities(String regexTag) {
+		return entities.stream().filter(e -> e.tag.matches(regexTag)).toList();
 	}
 
 	public void prepareRemove(Entity e) {

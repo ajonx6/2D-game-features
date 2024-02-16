@@ -46,7 +46,7 @@ public class MoveComponent extends Component {
 		if (KeyInput.isDown(KeyEvent.VK_S)) direction.setY(direction.getY() + 1);
 		if (KeyInput.isDown(KeyEvent.VK_A)) direction.setX(-1);
 		if (KeyInput.isDown(KeyEvent.VK_D)) direction.setX(direction.getX() + 1);
-		
+
 		setVelocity();
 	}
 
@@ -149,6 +149,10 @@ public class MoveComponent extends Component {
 
 	public int getCurrState() {
 		return currState;
+	}
+	
+	public void setState(int state) {
+		this.currState = state;
 	}
 
 	public boolean canSwim() {

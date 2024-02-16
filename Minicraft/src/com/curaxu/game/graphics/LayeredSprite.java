@@ -32,6 +32,10 @@ public class LayeredSprite implements AbstractSprite {
 	private HashMap<String, Layer> names = new HashMap<>();
 	private List<Layer> layers = new ArrayList<>();
 
+	public LayeredSprite(AbstractSprite sprite) {
+		addLayer("main", sprite, 255, false);
+	}
+
 	public LayeredSprite addLayer(String name, AbstractSprite sprite, int alpha, boolean overlay) {
 		AbstractSprite copy = sprite.copy();
 		for (int i = 0; i < copy.getPixels().length; i++) {

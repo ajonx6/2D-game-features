@@ -23,6 +23,14 @@ public class MouseInput implements MouseListener, MouseMotionListener, MouseWhee
 		binds.get(button).add(input);
 	}
 
+	public static Vector getMousePosition() {
+		return new Vector(mx, my);
+	}
+
+	public static Vector getMouseWorldPos() {
+		return new Vector(mx / 2, my / 2).sub(Game.getInstance().getScreen().getOffset());
+	}
+
 	public void mousePressed(MouseEvent e) {
 		buttons[e.getButton()] = true;
 	}

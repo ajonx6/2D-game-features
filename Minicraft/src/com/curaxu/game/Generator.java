@@ -3,9 +3,7 @@ package com.curaxu.game;
 import com.curaxu.game.entity.Collisions;
 import com.curaxu.game.entity.Entity;
 import com.curaxu.game.entity.components.*;
-import com.curaxu.game.graphics.AnimatedSprite;
-import com.curaxu.game.graphics.Sprite;
-import com.curaxu.game.graphics.SpriteSheet;
+import com.curaxu.game.graphics.*;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -33,6 +31,7 @@ public class Generator {
 				new Pair<>("swim_right", playerSwimSprites.getSprite(2)),
 				new Pair<>("swim_up", playerSwimSprites.getSprite(3))
 		));
+
 		// player.addComponent(new CollisionResolveComponent(player, "npc", true) {
 		// 	public void onCollision(HashMap<Entity, Collisions.CollisionData> collided, double delta) {
 		// 		MoveComponent comp = (MoveComponent) player.getComponent("Move");
@@ -120,8 +119,25 @@ public class Generator {
 		sheep.addComponent(new RandomWalkComponent(sheep));
 		sheep.addComponent(new AABBBoxComponent(sheep, sheep.getScreenPos()));
 		sheep.addComponent(new CameraComponent(sheep, false));
+		sheep.addComponent(new HealthComponent(sheep, 3));
 
 		sheep.verifyComponents();
 		return sheep;
+	}
+
+	public static Entity generateBloodSplatter(double x, double y) {
+		Entity bloodGroup = new Entity(x, y, "Blood Group", "blood").onFloor();
+		bloodGroup.verifyComponents();
+
+		int numBloodSplatters = 4 + RANDOM.nextInt(10);
+		for (int i = 0; i < numBloodSplatters; i++) {
+			Entity bloodSplatter = new Entity(-10 + RANDOM.nextInt(20), -10 + RANDOM.nextInt(20), "Blood " + i, "blood").onFloor();
+			bloodSplatter.addComponent(new SpriteListComponent(bloodSplatter, "default",
+					new Pair<>("default", Sprite.createCircle(2 + RANDOM.nextInt(6), 0xFF880808))));
+			bloodSplatter.verifyComponents();
+			bloodGroup.addChild(bloodSplatter);
+		}
+
+		return bloodGroup;
 	}
 }
