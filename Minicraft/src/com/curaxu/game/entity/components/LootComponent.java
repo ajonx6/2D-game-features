@@ -6,38 +6,57 @@ import com.curaxu.game.items.Item;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class LootComponent extends Component {
-    public List<LootDrop> lootDropList = new ArrayList<>();
+	public static final Random RANDOM = new Random();
 
-    public LootComponent(Entity entity) {
-        super(entity);
-    }
+	private List<LootDrop> lootDropList = new ArrayList<>();
 
-    public LootComponent addLoot(Item item, int min, int max, float prob) {
-        lootDropList.add(new LootDrop(item, min, max, prob));
-        return this;
-    }
+	public LootComponent(Entity entity) {
+		super(entity);
+	}
 
-    public void tick(double delta) {}
+	public LootComponent addLoot(Item item, int min, int max, double prob) {
+		lootDropList.add(new LootDrop(item, min, max, prob));
+		return this;
+	}
 
-    public void render(Screen screen) {}
+	public void tick(double delta) {}
 
-    public String getName() {
-        return "Loot";
-    }
+	public void render(Screen screen) {}
 
-    private static class LootDrop {
-        private Item item;
-        private int minAmount;
-        private int maxAmount;
-        private float probability;
+	public void generateLoot() {
+		List<Item> loot = new ArrayList<>();
+		for (LootDrop drop : lootDropList) {
+			for (int i = 0; i < drop.minAmount; i++) {
+				loot.add(drop.item);
+			}
+			for (int i = drop.minAmount; i < drop.maxAmount; i++) {
+				if (RANDOM.nextDouble() < drop.probability) loot.add(drop.item);
+			}
+		}
 
-        public LootDrop(Item item, int minAmount, int maxAmount, float probability) {
-            this.item = item;
-            this.minAmount = minAmount;
-            this.maxAmount = maxAmount;
-            this.probability = probability;
-        }
-    }
+		for (Item item : loot) {
+			Item.createItemEntity(item, entity.getCenterWorldPos().getX() - 32 + RANDOM.nextInt(64), entity.getCenterWorldPos().getY() - 32 + RANDOM.nextInt(64));
+		}
+	}
+
+	public String getName() {
+		return "Loot";
+	}
+
+	private static class LootDrop {
+		private Item item;
+		private int minAmount;
+		private int maxAmount;
+		private double probability;
+
+		public LootDrop(Item item, int minAmount, int maxAmount, double probability) {
+			this.item = item;
+			this.minAmount = minAmount;
+			this.maxAmount = maxAmount;
+			this.probability = probability;
+		}
+	}
 }

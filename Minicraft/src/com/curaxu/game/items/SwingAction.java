@@ -32,7 +32,7 @@ public class SwingAction implements ItemAction {
 		Vector userToMouse = MouseInput.getMouseWorldPos().sub(user.getCenterWorldPos());
 		Vector focalPoint = user.getCenterWorldPos().sub(userToMouse.normalize().mul(BACKWARDS));
 
-		for (Entity e : level.getEntities("sheep")) {
+		for (Entity e : level.getEntities("(sheep)|(npc)")) {
 			Vector focalToEntity = e.getWorldPos().sub(focalPoint);
 			if (focalToEntity.length() <= range + BACKWARDS && userToMouse.normalize().dot(focalToEntity.normalize()) >= angleInDot) {
 				boolean killed = ((HealthComponent) e.getComponent("Health")).damage(1);

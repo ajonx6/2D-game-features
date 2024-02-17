@@ -35,7 +35,7 @@ public class SpriteListComponent extends Component {
 	public void render(Screen screen) {
 		screen.renderSprite(entity.getScreenPos(), currSprite);
 	}
-	
+
 	public void addToSprites(String name, Sprite sprite, int alpha, boolean overlay) {
 		for (LayeredSprite layer : sprites.values()) {
 			layer.addLayer(name, sprite, alpha, overlay);

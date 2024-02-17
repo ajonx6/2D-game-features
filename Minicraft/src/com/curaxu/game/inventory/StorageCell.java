@@ -30,7 +30,11 @@ public class StorageCell {
 	}
 
 	public void render(Screen screen) {
-		screen.renderSprite(position, cell);
+		render(screen, cell, position);
+	}
+
+	public void render(Screen screen, Sprite sprite, Vector position) {
+		screen.renderSprite(position, sprite);
 		if (item != null) {
 			Vector itemPos = position.add(new Vector(CELL_SIZE, CELL_SIZE).div(2)).sub(new Vector(item.getSprite().getWidth(), item.getSprite().getHeight()).div(2));
 			item.render(screen, itemPos);
@@ -50,6 +54,11 @@ public class StorageCell {
 
 	public void initPosition() {
 		this.position = new Vector((1 + x) * CELL_GAP + x * CELL_SIZE, (1 + y) * CELL_GAP + y * CELL_SIZE);
+	}
+
+	public void reset() {
+		item = null;
+		amt = 0;
 	}
 
 	public int getX() {

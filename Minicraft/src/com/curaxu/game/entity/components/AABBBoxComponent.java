@@ -44,7 +44,7 @@ public class AABBBoxComponent extends Component {
 			screen.renderRect(box.getPosition().add(Game.getInstance().getScreen().getOffset()), (int) box.getWidth(), (int) box.getHeight(), hasCollided ? collideColour : uncollideColour);
 		}
 	}
-
+	
 	public boolean hasCollided() {
 		return hasCollided;
 	}

@@ -74,7 +74,8 @@ public class Level {
 
 		for (int y = 0; y < levelHeight; y++) {
 			for (int x = 0; x < levelWidth; x++) {
-				tileIDs[x + y * levelWidth] = ((pixels[x + y * levelWidth] >> 16) & 0xff) < 110 ? Tile.WATER.getId() : Tile.GRASS.getId();
+				int tileValue = ((pixels[x + y * levelWidth] >> 16) & 0xff);
+				tileIDs[x + y * levelWidth] = tileValue <= 100 ? Tile.WATER.getId() : tileValue <= 140 ? Tile.SAND.getId() : Tile.GRASS.getId();
 			}
 		}
 

@@ -87,6 +87,11 @@ public class LayeredSprite implements AbstractSprite {
 	}
 
 	public AbstractSprite copy() {
-		return null;
+		LayeredSprite copy = new LayeredSprite(layers.get(0).sprite);
+		for (String name : names.keySet()) {
+			Layer layer = names.get(name);
+			copy.addLayer(name, layer.sprite.copy(), layer.alpha, layer.overlay);
+		}
+		return copy;
 	}
 }

@@ -1,6 +1,5 @@
 package com.curaxu.game.inventory;
 
-import com.curaxu.game.entity.components.ItemComponent;
 import com.curaxu.game.graphics.Screen;
 import com.curaxu.game.items.Item;
 
@@ -20,7 +19,7 @@ public class Storage {
 			}
 		}
 	}
-	
+
 	public int addItemToStorage(Item item, int amt) {
 		boolean loop = true;
 		while (loop && amt > 0) {
@@ -32,22 +31,36 @@ public class Storage {
 
 	public boolean addItemToStorage(Item item) {
 		for (StorageCell cell : cells) {
-			if (cell.getItem() == null || (item.equals(cell.getItem()) && cell.getAmt() < cell.getItem().getStackSize())) {
-				cell.setItem(item);
+			if (item.equals(cell.getItem()) && cell.getAmt() < cell.getItem().getStackSize()) {
 				cell.setAmt(cell.getAmt() + 1);
 				return true;
 			}
 		}
+		
+		for (StorageCell cell : cells) {
+			if (cell.getItem() == null) {
+				cell.setItem(item);
+				cell.setAmt(1);
+				return true;
+			}
+		}
+		
 		return false;
 	}
 
-	public void remove(Item item) {
-		for (StorageCell cell : cells) {
-			if (item.equals(cell.getItem())) {
-				cell.setAmt(cell.getAmt() - 1);
-				if (cell.getAmt() == 0) cell.setItem(null);
-			}
+	public void remove(int x, int y, int amt) {
+		int newAmt = cells[x + y * width].getAmt() - amt;
+		if (newAmt <= 0) {
+			cells[x + y * width].reset();
+		} else {
+			cells[x + y * width].setAmt(newAmt);
 		}
+		// for (StorageCell cell : cells) {
+		// 	if (item.equals(cell.getItem())) {
+		// 		cell.setAmt(cell.getAmt() - 1);
+		// 		if (cell.getAmt() == 0) cell.setItem(null);
+		// 	}
+		// }
 	}
 
 	public void setCellItem(int x, int y, Item item, int amt) {

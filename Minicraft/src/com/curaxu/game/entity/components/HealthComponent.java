@@ -15,7 +15,7 @@ public class HealthComponent extends Component {
 
 	private double healthFlashTimer = 0;
 	private boolean healthFlashActive = false;
-	
+
 	public HealthComponent(Entity entity, int maxHealth) {
 		super(entity, "SpriteList");
 		this.spriteListComponent = (SpriteListComponent) entity.getComponent("SpriteList");
@@ -30,6 +30,9 @@ public class HealthComponent extends Component {
 		spriteListComponent.addToSprites("damage", VisualEffect.DAMAGE, 130, true);
 		if (currentHealth <= 0) {
 			currentHealth = 0;
+			if (entity.getComponent("Loot") != null) {
+				((LootComponent) entity.getComponent("Loot")).generateLoot();
+			}
 			return true;
 		}
 		return false;

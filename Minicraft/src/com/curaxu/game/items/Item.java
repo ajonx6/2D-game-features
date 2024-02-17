@@ -10,6 +10,7 @@ import com.curaxu.game.entity.components.CollisionResolveComponent;
 import com.curaxu.game.entity.components.ItemComponent;
 import com.curaxu.game.entity.components.SpriteListComponent;
 import com.curaxu.game.graphics.*;
+import com.curaxu.game.inventory.StorageCell;
 import com.curaxu.game.level.Level;
 
 import java.util.ArrayList;
@@ -17,11 +18,18 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Item {
-	public static final Item WOOD = new Item("Wood", new Sprite("items/wood"), 1);
-	public static final Item EMPTY_VIAL = new Item("Empty Vial", new Sprite("items/empty_vial"), 1);
-	public static final Item BLOOD_VIAL = new Item("Blood Vial", new Sprite("items/blood_vial"), 1);
-	public static final Item SHINY = new Item("Shiny", new AnimatedSprite(new SpriteSheet("items/shiny", 32, 32)).setTimes(0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1), 1);
-	public static final Item SHEEP_EYE = new Item("Sheep Eye", new Sprite("items/sheep_eye"), 1);
+	public static final Item WOOD = new Item("Wood", new Sprite("items/wood"), 32);
+	public static final Item EMPTY_VIAL = new Item("Empty Vial", new Sprite("items/empty_vial"), 16).addAction(new ItemAction() {
+		public void onLeftClick(Entity user, Level level) {
+			Game.getInstance().inventory.remove(Game.getInstance().hotbar.getSelected(), 0, 1);
+			Game.getInstance().inventory.addItemToStorage(BLOOD_VIAL);
+		}
+
+		public void onRightClick(Entity user, Level level) {}
+	});
+	public static final Item BLOOD_VIAL = new Item("Blood Vial", new Sprite("items/blood_vial"), 16);
+	public static final Item SHINY = new Item("Shiny", new AnimatedSprite(new SpriteSheet("items/shiny", 32, 32)).setTimes(0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1), 32);
+	public static final Item SHEEP_EYE = new Item("Sheep Eye", new Sprite("items/sheep_eye"), 16);
 	public static final Item KUNAI = new Item("Kunai", new Sprite("items/kunai"), 1).addAction(new SwingAction(50, 30.0, 5));
 
 	public static int nextId = 0;
@@ -62,7 +70,7 @@ public class Item {
 		for (ItemAction action : actions) action.onRightClick(user, level);
 	}
 
-	public static Entity createItemEntity(Item item, int x, int y, Game game) {
+	public static Entity createItemEntity(Item item, double x, double y) {
 		item = item.copy();
 		Entity itemEntity = new Entity(x, y, item.getName(), "item");
 		//-" + item.getName().toLowerCase().replace(" ", "-")
@@ -74,18 +82,18 @@ public class Item {
 				ItemComponent comp = (ItemComponent) entity.getComponent("Item");
 				if (comp.isPickedUp()) return;
 				Item item = comp.getItem();
-				boolean successful = game.inventory.addItemToStorage(item);
+				boolean successful = Game.getInstance().inventory.addItemToStorage(item);
 				if (successful) {
 					comp.isPickedUp(true);
 					item.sprite.reset();
-					game.level.prepareRemove(itemEntity);
+					Game.getInstance().level.prepareRemove(itemEntity);
 				}
 			}
 
 			public void noCollisions(double delta) {
 			}
 		});
-		game.level.addEntity(itemEntity);
+		Game.getInstance().level.addEntity(itemEntity);
 		return itemEntity;
 	}
 

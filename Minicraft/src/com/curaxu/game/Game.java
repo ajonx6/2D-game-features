@@ -8,10 +8,8 @@ import com.curaxu.game.audio.tracks.EndingTrack;
 import com.curaxu.game.audio.tracks.LoopTrack;
 import com.curaxu.game.audio.tracks.RandomTrack;
 import com.curaxu.game.entity.Entity;
-import com.curaxu.game.graphics.LayeredSprite;
 import com.curaxu.game.graphics.Screen;
-import com.curaxu.game.graphics.ScrollableSprite;
-import com.curaxu.game.graphics.Sprite;
+import com.curaxu.game.inventory.Hotbar;
 import com.curaxu.game.inventory.Storage;
 import com.curaxu.game.items.Item;
 import com.curaxu.game.level.Level;
@@ -23,7 +21,6 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.util.Arrays;
 import java.util.Random;
 
 public class Game extends Canvas implements Runnable {
@@ -47,33 +44,34 @@ public class Game extends Canvas implements Runnable {
 	public Level level;
 	public Entity player;
 	public Random random = new Random();
-	public Storage inventory;
 	public CompoundData sound;
+
+	public Storage inventory;
+	public boolean showInventory = false;
+	public Hotbar hotbar;
 
 	private Game() {
 		screen = new Screen(PIXEL_WIDTH, PIXEL_HEIGHT);
 		level = new Level(128, 72);
 
-		inventory = new Storage(3, 3);
-		inventory.setCellItem(0, 0, Item.EMPTY_VIAL, 5);
-		inventory.setCellItem(1, 0, Item.SHINY, 17);
-		inventory.setCellItem(2, 0, Item.KUNAI, 1);
+		inventory = new Storage(6, 3);
+		inventory.setCellItem(0, 0, Item.KUNAI, 1);
+		inventory.setCellItem(1, 0, Item.EMPTY_VIAL, 14);
+		inventory.setCellItem(2, 0, Item.SHINY, 4);
+		hotbar = new Hotbar(inventory);
 
 		player = Generator.generatePlayer(3, 3);
 		level.addEntity(player);
-		// level.addEntity(Generator.generateBloodSplatter());
-		// Item.createItemEntity(Item.EMPTY_VIAL, 200, 200, this);
 
 		sound = new CompoundData(
-				new LoopTrack("stone", "stone"),
-				new RandomTrack(new SoundGroup(new SoundData(SoundData.PLAY, 1, false)).addSound("ding", "ding").addSound("sound", "sound"), 6.0, 12.0),
-				new EndingTrack("lake", "lake", false)
+				new LoopTrack("stone", "sounds/sfx/stone"),
+				new RandomTrack(new SoundGroup(new SoundData(SoundData.PLAY, 1, false)).addSound("ding", "sounds/sfx/ding").addSound("sound", "sounds/sfx/sound"), 2.0, 4.0),
+				new EndingTrack("lake", "sounds/music/lake", false)
 		);
 
 		for (int i = 0; i < 20; i++) {
 			if (random.nextBoolean()) level.addEntity(Generator.generateNPC());
 			else level.addEntity(Generator.generateSheep());
-			// level.addEntity(Generator.generateNPC());
 		}
 
 		// ParticleBlueprint pn1 = new ParticleBlueprint().setSize(5).setColors(0x22444444).setSpeed(8).setDirection(0.0, 360.0).setDeceleration(0).setLife(2).lifeDeterminesAlpha();
@@ -151,23 +149,21 @@ public class Game extends Canvas implements Runnable {
 		double delta = Time.getFrameTimeInSeconds();
 		if (KeyInput.isDown(KeyEvent.VK_ESCAPE)) System.exit(0);
 
-		if (KeyInput.wasPressed(KeyEvent.VK_1)) {
-			inventory.getCell(0, 0).getItem().leftClick(player, level);
+		for (int numKey = KeyEvent.VK_1; numKey <= KeyEvent.VK_6; numKey++) {
+			if (KeyInput.wasPressed(numKey)) hotbar.setSelected(numKey - KeyEvent.VK_1);
 		}
-		if (KeyInput.wasPressed(KeyEvent.VK_2)) {
-			inventory.getCell(1, 0).getItem().leftClick(player, level);
+
+		if (KeyInput.wasPressed(KeyEvent.VK_SPACE)) {
+			showInventory = !showInventory;
+			System.out.println(showInventory);
 		}
-		if (KeyInput.wasPressed(KeyEvent.VK_3)) {
-			inventory.getCell(2, 0).getItem().leftClick(player, level);
-		}
+
 		// if (MouseInput.wasPressed(MouseEvent.BUTTON3)) {
-		// 	CameraComponent.activeCamera.deactivate();
-		// 	List<Entity> e = level.getEntities("test");
+		// 	((CameraComponent) player.getComponent("Camera")).deactivate();
+		// 	// CameraComponent.activeCamera.deactivate();
+		// 	List<Entity> e = level.getEntities("npc");
 		// 	Entity picked = e.get(random.nextInt(e.size()));
 		// 	((CameraComponent) picked.getComponent("Camera")).activate();
-		// 	((InputListenerComponent) currEntity.getComponent("InputListener")).deactivateAll();
-		// 	currEntity = picked;
-		// 	((InputListenerComponent) currEntity.getComponent("InputListener")).activateAll();
 		// }
 
 		// if (KeyInput.wasPressed(KeyEvent.VK_L)) {
@@ -177,11 +173,20 @@ public class Game extends Canvas implements Runnable {
 		// 	sound.cancel();
 		// }
 
+		if (MouseInput.wasPressed(MouseEvent.BUTTON1)) {
+			if (inventory.getCell(hotbar.getSelected(), 0).getItem() != null)
+				inventory.getCell(hotbar.getSelected(), 0).getItem().leftClick(player, level);
+		}
+		if (MouseInput.wasPressed(MouseEvent.BUTTON3)) {
+			if (inventory.getCell(hotbar.getSelected(), 0).getItem() != null)
+				inventory.getCell(hotbar.getSelected(), 0).getItem().rightClick(player, level);
+		}
+
 		if (KeyInput.wasPressed(KeyEvent.VK_E)) {
-			inventory.getCell(2, 0).getItem().isEnchanted(!inventory.getCell(2, 0).getItem().isEnchanted());
+			inventory.getCell(hotbar.getSelected(), 0).getItem().isEnchanted(!inventory.getCell(hotbar.getSelected(), 0).getItem().isEnchanted());
 		}
 		if (KeyInput.wasPressed(KeyEvent.VK_I)) {
-			inventory.getCell(2, 0).getItem().isSparkle(!inventory.getCell(2, 0).getItem().isSparkle());
+			inventory.getCell(hotbar.getSelected(), 0).getItem().isSparkle(!inventory.getCell(hotbar.getSelected(), 0).getItem().isSparkle());
 		}
 
 		SoundManager.tick(delta);
@@ -203,7 +208,8 @@ public class Game extends Canvas implements Runnable {
 		screen.clear();
 
 		level.render(screen);
-		inventory.render(screen);
+		hotbar.render(screen);
+		if (showInventory) inventory.render(screen);
 
 		int[] ps = screen.getPixels();
 		System.arraycopy(ps, 0, pixels, 0, pixels.length);

@@ -4,8 +4,10 @@ import com.curaxu.game.entity.Collisions;
 import com.curaxu.game.entity.Entity;
 import com.curaxu.game.entity.components.*;
 import com.curaxu.game.graphics.*;
+import com.curaxu.game.items.Item;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 public class Generator {
@@ -92,6 +94,8 @@ public class Generator {
 		king.addComponent(new RandomWalkComponent(king));
 		king.addComponent(new AABBBoxComponent(king, king.getScreenPos()));
 		king.addComponent(new CameraComponent(king, false));
+		king.addComponent(new HealthComponent(king, 3));
+		king.addComponent(new LootComponent(king).addLoot(Item.SHINY, 3, 12, 0.5));
 
 		king.verifyComponents();
 		return king;
@@ -120,6 +124,7 @@ public class Generator {
 		sheep.addComponent(new AABBBoxComponent(sheep, sheep.getScreenPos()));
 		sheep.addComponent(new CameraComponent(sheep, false));
 		sheep.addComponent(new HealthComponent(sheep, 3));
+		sheep.addComponent(new LootComponent(sheep).addLoot(Item.SHEEP_EYE, 1, 2, 0.3));
 
 		sheep.verifyComponents();
 		return sheep;
