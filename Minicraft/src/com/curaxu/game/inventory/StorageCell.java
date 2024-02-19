@@ -7,7 +7,7 @@ import com.curaxu.game.graphics.SpriteSheet;
 import com.curaxu.game.items.Item;
 
 public class StorageCell {
-	public static final Sprite cell = new Sprite("inventory_cell");
+	public static final Sprite cell = new Sprite("ui/inventory_cell");
 	public static final SpriteSheet digits = new SpriteSheet("digits", 3, 5);
 
 	public static final int CELL_SIZE = 40;

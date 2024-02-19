@@ -1,6 +1,6 @@
 package com.curaxu.game.graphics;
 
-public class SpriteSheet {
+public class SpriteSheet {	
 	private Sprite sprite;
 	private int width, height;
 	private int spriteWidth, spriteHeight;

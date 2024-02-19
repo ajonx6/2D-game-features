@@ -4,25 +4,24 @@ import com.curaxu.game.Vector;
 import com.curaxu.game.graphics.AbstractSprite;
 
 public class AABBBox {
-	private Vector origPosition;
-	// private Vector offsetPosition;
+	private Vector worldPos;
+	private Vector offset;
 	private Vector size;
 
-	public AABBBox(Vector position, double width, double height) {
-		this.origPosition = position;
-		// this.offsetPosition = origPosition;
+	public AABBBox(Vector worldPos, Vector offset, Vector size) {
+		this(worldPos, offset, size.getX(), size.getY());
+	}
+
+	public AABBBox(Vector worldPos, Vector offset, double width, double height) {
+		this.worldPos = worldPos;
+		this.offset = offset;
 		this.size = new Vector(width, height);
 	}
 
-	public AABBBox(Vector position, Vector size) {
-		this(position, size.getX(), size.getY());
-	}
-
-	public AABBBox(Vector position, AbstractSprite sprite) {
-		this.origPosition = position;
-		// this.offsetPosition = origPosition;
-		// setSize(sprite);
-		size = new Vector(sprite.getWidth(), sprite.getHeight());
+	public AABBBox(Vector worldPos, Vector offset, AbstractSprite sprite) {
+		this.worldPos = worldPos;
+		this.offset = offset;
+		this.size = new Vector(sprite.getWidth(), sprite.getHeight());
 	}
 
 	public double getWidth() {
@@ -49,15 +48,19 @@ public class AABBBox {
 		size = new Vector(sprite.getWidth(), sprite.getHeight());
 	}
 
-	public void setPosition(Vector origPosition) {
-		this.origPosition = origPosition;
+	public void setWorldPosition(Vector worldPos) {
+		this.worldPos = worldPos;
 	}
 
-	public Vector getPosition() {
-		return origPosition;
+	public Vector getAbsolutePosition() {
+		return worldPos.add(offset);
+	}
+
+	public Vector getOffset() {
+		return offset;
 	}
 
 	public Vector getOtherCorner() {
-		return getPosition().add(getSize());
+		return getAbsolutePosition().add(getSize());
 	}
 }

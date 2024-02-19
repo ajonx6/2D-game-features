@@ -8,6 +8,9 @@ import com.curaxu.game.audio.tracks.EndingTrack;
 import com.curaxu.game.audio.tracks.LoopTrack;
 import com.curaxu.game.audio.tracks.RandomTrack;
 import com.curaxu.game.entity.Entity;
+import com.curaxu.game.events.cutscenes.CameraMovementEvent;
+import com.curaxu.game.events.cutscenes.Cutscene;
+import com.curaxu.game.events.cutscenes.WaitEvent;
 import com.curaxu.game.graphics.Screen;
 import com.curaxu.game.inventory.Hotbar;
 import com.curaxu.game.inventory.Storage;
@@ -50,9 +53,12 @@ public class Game extends Canvas implements Runnable {
 	public boolean showInventory = false;
 	public Hotbar hotbar;
 
+	public Cutscene group;
+
 	private Game() {
 		screen = new Screen(PIXEL_WIDTH, PIXEL_HEIGHT);
 		level = new Level(128, 72);
+		level.initLevel();
 
 		inventory = new Storage(6, 3);
 		inventory.setCellItem(0, 0, Item.KUNAI, 1);
@@ -60,8 +66,10 @@ public class Game extends Canvas implements Runnable {
 		inventory.setCellItem(2, 0, Item.SHINY, 4);
 		hotbar = new Hotbar(inventory);
 
-		player = Generator.generatePlayer(3, 3);
+		player = Generator.generatePlayer(96, 96);
 		level.addEntity(player);
+
+		group = new Cutscene().addEvent(new CameraMovementEvent(new Vector(0, 0), new Vector(100, 100), 2.0)).addEvent(new WaitEvent(0.5)).addEvent(new CameraMovementEvent(new Vector(100, 100), new Vector(0, 0), 1.0));
 
 		sound = new CompoundData(
 				new LoopTrack("stone", "sounds/sfx/stone"),
@@ -70,8 +78,10 @@ public class Game extends Canvas implements Runnable {
 		);
 
 		for (int i = 0; i < 20; i++) {
-			if (random.nextBoolean()) level.addEntity(Generator.generateNPC());
-			else level.addEntity(Generator.generateSheep());
+			if (random.nextBoolean())
+				level.addEntity(Generator.generateNPC(random.nextInt(Game.PIXEL_WIDTH), random.nextInt(Game.PIXEL_HEIGHT)));
+			else
+				level.addEntity(Generator.generateSheep(random.nextInt(Game.PIXEL_WIDTH), random.nextInt(Game.PIXEL_HEIGHT)));
 		}
 
 		// ParticleBlueprint pn1 = new ParticleBlueprint().setSize(5).setColors(0x22444444).setSpeed(8).setDirection(0.0, 360.0).setDeceleration(0).setLife(2).lifeDeterminesAlpha();
@@ -148,14 +158,15 @@ public class Game extends Canvas implements Runnable {
 	public void tick() {
 		double delta = Time.getFrameTimeInSeconds();
 		if (KeyInput.isDown(KeyEvent.VK_ESCAPE)) System.exit(0);
+		if (KeyInput.wasPressed(KeyEvent.VK_ENTER)) Settings.debugMode = !Settings.debugMode;
 
 		for (int numKey = KeyEvent.VK_1; numKey <= KeyEvent.VK_6; numKey++) {
 			if (KeyInput.wasPressed(numKey)) hotbar.setSelected(numKey - KeyEvent.VK_1);
 		}
 
 		if (KeyInput.wasPressed(KeyEvent.VK_SPACE)) {
-			showInventory = !showInventory;
-			System.out.println(showInventory);
+			// showInventory = !showInventory;
+			group.play();
 		}
 
 		// if (MouseInput.wasPressed(MouseEvent.BUTTON3)) {
@@ -193,6 +204,7 @@ public class Game extends Canvas implements Runnable {
 		KeyInput.tick();
 		MouseInput.tick();
 
+		group.tick(delta);
 		level.tick(delta);
 		level.removeEntities();
 		inventory.tick(delta);

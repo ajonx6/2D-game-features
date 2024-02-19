@@ -77,22 +77,22 @@ public class Item {
 		itemEntity.addComponent(new SpriteListComponent(itemEntity, "-", new Pair<>("-", item.getSprite())));
 		itemEntity.addComponent(new ItemComponent(itemEntity, item));
 		itemEntity.addComponent(new AABBBoxComponent(itemEntity, new Vector(), ((SpriteListComponent) itemEntity.getComponent("SpriteList")).getCurrentSprite()));
-		itemEntity.addComponent(new CollisionResolveComponent(itemEntity, "player", false) {
-			public void onCollision(HashMap<Entity, Collisions.CollisionData> data, double delta) {
-				ItemComponent comp = (ItemComponent) entity.getComponent("Item");
-				if (comp.isPickedUp()) return;
-				Item item = comp.getItem();
-				boolean successful = Game.getInstance().inventory.addItemToStorage(item);
-				if (successful) {
-					comp.isPickedUp(true);
-					item.sprite.reset();
-					Game.getInstance().level.prepareRemove(itemEntity);
-				}
-			}
-
-			public void noCollisions(double delta) {
-			}
-		});
+		// itemEntity.addComponent(new CollisionResolveComponent(itemEntity, "player", false) {
+		// 	public void onCollision(HashMap<Entity, Collisions.CollisionData> data, double delta) {
+		// 		ItemComponent comp = (ItemComponent) entity.getComponent("Item");
+		// 		if (comp.isPickedUp()) return;
+		// 		Item item = comp.getItem();
+		// 		boolean successful = Game.getInstance().inventory.addItemToStorage(item);
+		// 		if (successful) {
+		// 			comp.isPickedUp(true);
+		// 			item.sprite.reset();
+		// 			Game.getInstance().level.prepareRemove(itemEntity);
+		// 		}
+		// 	}
+		//
+		// 	public void noCollisions(double delta) {
+		// 	}
+		// });
 		Game.getInstance().level.addEntity(itemEntity);
 		return itemEntity;
 	}

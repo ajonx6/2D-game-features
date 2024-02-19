@@ -7,8 +7,8 @@ import com.curaxu.game.graphics.Sprite;
 import com.curaxu.game.graphics.SpriteSheet;
 
 public class Hotbar {
-	public static final Sprite CELL_SPRITE = new Sprite("inventory_cell");
-	public static final Sprite SELECTED_CELL_SPRITE = new Sprite("selected_cell");
+	public static final Sprite CELL_SPRITE = new Sprite("ui/inventory_cell");
+	public static final Sprite SELECTED_CELL_SPRITE = new Sprite("ui/selected_cell");
 	public static final int NUM_CELLS = 6;
 	public static final int CELL_SIZE = 40;
 	public static final int CELL_GAP = 2;

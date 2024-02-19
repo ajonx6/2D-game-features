@@ -3,9 +3,12 @@ package com.curaxu.game;
 import com.curaxu.game.entity.Collisions;
 import com.curaxu.game.entity.Entity;
 import com.curaxu.game.entity.components.*;
-import com.curaxu.game.graphics.*;
+import com.curaxu.game.graphics.AnimatedSprite;
+import com.curaxu.game.graphics.Sprite;
+import com.curaxu.game.graphics.SpriteSheet;
 import com.curaxu.game.items.Item;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -13,10 +16,72 @@ import java.util.Random;
 public class Generator {
 	public static final Random RANDOM = new Random();
 
-	// ! TODO CONTINUE THE SPRITE FIXING AND BLUEPRINTS AND COLLISIONS ETC
+	public static List<Vector> generatePoints(double radius, Vector startCoord, Vector dimensions) {
+		return generatePoints(radius, startCoord, dimensions, 30);
+	}
 
-	public static Entity generatePlayer(int tileX, int tileY) {
-		Entity player = new Entity(tileX, tileY, "Player", "player");
+	public static List<Vector> generatePoints(double radius, Vector startCoord, Vector dimensions, int numSamplesBeforeReject) {
+		double cellSize = radius / Math.sqrt(2.0);
+
+		int[][] grid = new int[(int) Math.ceil(dimensions.getX() / cellSize)][(int) Math.ceil(dimensions.getY() / cellSize)];
+		List<Vector> points = new ArrayList<>();
+		List<Vector> spawnPoints = new ArrayList<>();
+
+		spawnPoints.add(dimensions.div(2.0));
+		while (!spawnPoints.isEmpty()) {
+			int spawnIndex = RANDOM.nextInt(spawnPoints.size());
+			Vector spawnCentre = spawnPoints.get(spawnIndex);
+			boolean wasAccepted = false;
+
+			for (int i = 0; i < numSamplesBeforeReject; i++) {
+				double angle = RANDOM.nextDouble() * Math.PI * 2.0;
+				Vector direction = new Vector(Math.sin(angle), Math.cos(angle));
+				Vector candidate = spawnCentre.add(direction.mul(RANDOM.nextDouble(radius, radius * 2)));
+				if (isValid(candidate, dimensions, cellSize, radius, points, grid)) {
+					wasAccepted = true;
+					points.add(candidate);
+					spawnPoints.add(candidate);
+					grid[(int) (candidate.getX() / cellSize)][(int) (candidate.getY() / cellSize)] = points.size();
+					break;
+				}
+			}
+
+			if (!wasAccepted) spawnPoints.remove(spawnIndex);
+		}
+
+		List<Vector> toRet = new ArrayList<>();
+		for (Vector point : points) {
+			toRet.add(point.add(startCoord));
+		}
+		return toRet;
+	}
+
+	public static boolean isValid(Vector candidate, Vector dimensions, double cellSize, double radius, List<Vector> points, int[][] grid) {
+		if (candidate.getX() >= 0 && candidate.getX() < dimensions.getX() && candidate.getY() >= 0 && candidate.getY() < dimensions.getY()) {
+			int cellX = (int) (candidate.getX() / cellSize);
+			int cellY = (int) (candidate.getY() / cellSize);
+			int searchStartX = (int) Math.max(0, cellX - 2.0);
+			int searchStartY = (int) Math.max(0, cellY - 2.0);
+			int searchEndX = (int) Math.min(cellX + 2.0, grid.length - 1);
+			int searchEndY = (int) Math.min(cellY + 2.0, grid[0].length - 1);
+
+			for (int x = searchStartX; x <= searchEndX; x++) {
+				for (int y = searchStartY; y <= searchEndY; y++) {
+					int pointIndex = grid[x][y] - 1;
+					if (pointIndex != -1) {
+						double sqdist = candidate.sub(points.get(pointIndex)).lengthSquared();
+						if (sqdist < radius * radius) return false;
+					}
+				}
+			}
+
+			return true;
+		}
+		return false;
+	}
+
+	public static Entity generatePlayer(double x, double y) {
+		Entity player = new Entity(x, y, "Player", "player");
 		SpriteSheet playerSprites = new SpriteSheet("entities/player/player", 33, 48);
 		SpriteSheet playerSwimSprites = new SpriteSheet("entities/player/player_swim", 33, 40);
 		player.addComponent(new SpriteListComponent(player, "idle_down",
@@ -33,47 +98,34 @@ public class Generator {
 				new Pair<>("swim_right", playerSwimSprites.getSprite(2)),
 				new Pair<>("swim_up", playerSwimSprites.getSprite(3))
 		));
-
-		// player.addComponent(new CollisionResolveComponent(player, "npc", true) {
-		// 	public void onCollision(HashMap<Entity, Collisions.CollisionData> collided, double delta) {
-		// 		MoveComponent comp = (MoveComponent) player.getComponent("Move");
+		// player.addComponent(new CollisionResolveComponent(player, "tree", true) {
+		// 	public void onCollision(List<Entity> collided, double delta) {
 		// 		AABBBoxComponent playerBox = (AABBBoxComponent) player.getComponent("AABBBox");
 		// 		playerBox.hasCollided(true);
-		// 		for (Entity e : collided.keySet()) {
-		// 			Collisions.CollisionData data = collided.get(e);
-		// 			AABBBoxComponent other = (AABBBoxComponent) e.getComponent("AABBBox");
-		// 			if (data == null || data.contactNormal == null) continue;
+		// 		MoveComponent moveComponent = (MoveComponent) player.getComponent("Move");
 		//
-		// 			if (data.contactNormal.equals(new Vector(0, -1))) {
-		// 				comp.setMoveDir(0, false);
-		// 				player.worldPos.setY(other.getBox().getPosition().getY() - playerBox.getBox().getHeight() - 1);
-		// 			} else if (data.contactNormal.equals(new Vector(0, 1))) {
-		// 				comp.setMoveDir(1, false);
-		// 				player.worldPos.setY(other.getBox().getPosition().getY() + other.getBox().getHeight() + 1);
-		// 			} else if (data.contactNormal.equals(new Vector(-1, 0))) {
-		// 				comp.setMoveDir(2, false);
-		// 				player.worldPos.setX(other.getBox().getPosition().getX() - playerBox.getBox().getWidth() - 1);
-		// 			} else if (data.contactNormal.equals(new Vector(1, 0))) {
-		// 				comp.setMoveDir(3, false);
-		// 				player.worldPos.setX(other.getBox().getPosition().getX() + other.getBox().getWidth() + 1);
-		// 			}
-		// 		}
-		// 	}
+		// 		for (Entity e : collided) {
+		// 			AABBBoxComponent otherBox = (AABBBoxComponent) e.getComponent("AABBBox");
+		// 			otherBox.hasCollided(true);
+		// 			if (playerBox.getBox().getOtherCorner().getX() < )
+		// 			if (aabbBoxComponent.getBox().getAbsolutePosition().getX() < )
+		// }
+		// }
 		//
-		// 	public void noCollisions(double delta) {
-		// 		((AABBBoxComponent) player.getComponent("AABBBox")).hasCollided(false);
-		// 	}
+		// public void noCollisions(double delta) {
+		// 	((AABBBoxComponent) player.getComponent("AABBBox")).hasCollided(false);
+		// }
 		// });
 		player.addComponent(new MoveComponent(player, 150).setPlayerControls(true).canSwim(80));
-		player.addComponent(new AABBBoxComponent(player, player.getScreenPos()));
+		player.addComponent(new AABBBoxComponent(player, new Vector(6, 31), 21, 17));// new Vector(0, 0)));
 		player.addComponent(new CameraComponent(player, true));
 
 		player.verifyComponents();
 		return player;
 	}
 
-	public static Entity generateNPC() {
-		Entity king = new Entity(RANDOM.nextInt(Game.PIXEL_WIDTH), RANDOM.nextInt(Game.PIXEL_HEIGHT), "King", "npc");
+	public static Entity generateNPC(double x, double y) {
+		Entity king = new Entity(x, y, "King", "npc");
 		SpriteSheet kingSprites = new SpriteSheet("entities/king/king", 37, 47);
 		SpriteSheet kingSwimSprites = new SpriteSheet("entities/king/king_swim", 37, 40);
 		king.addComponent(new SpriteListComponent(king, "idle_down",
@@ -92,7 +144,7 @@ public class Generator {
 		));
 		king.addComponent(new MoveComponent(king, 60).canSwim(25));
 		king.addComponent(new RandomWalkComponent(king));
-		king.addComponent(new AABBBoxComponent(king, king.getScreenPos()));
+		king.addComponent(new AABBBoxComponent(king, new Vector(0, 0)));
 		king.addComponent(new CameraComponent(king, false));
 		king.addComponent(new HealthComponent(king, 3));
 		king.addComponent(new LootComponent(king).addLoot(Item.SHINY, 3, 12, 0.5));
@@ -101,8 +153,8 @@ public class Generator {
 		return king;
 	}
 
-	public static Entity generateSheep() {
-		Entity sheep = new Entity(RANDOM.nextInt(Game.PIXEL_WIDTH), RANDOM.nextInt(Game.PIXEL_HEIGHT), "Sally", "sheep");
+	public static Entity generateSheep(double x, double y) {
+		Entity sheep = new Entity(x, y, "Sally", "sheep");
 		SpriteSheet sheepSprites = new SpriteSheet("entities/sheep/sheep", 27, 27);
 		SpriteSheet sheepSwimSprites = new SpriteSheet("entities/sheep/sheep_swim", 27, 23);
 		sheep.addComponent(new SpriteListComponent(sheep, "idle_down",
@@ -121,7 +173,7 @@ public class Generator {
 		));
 		sheep.addComponent(new MoveComponent(sheep, 50).canSwim(20));
 		sheep.addComponent(new RandomWalkComponent(sheep));
-		sheep.addComponent(new AABBBoxComponent(sheep, sheep.getScreenPos()));
+		sheep.addComponent(new AABBBoxComponent(sheep, new Vector(0, 0)));
 		sheep.addComponent(new CameraComponent(sheep, false));
 		sheep.addComponent(new HealthComponent(sheep, 3));
 		sheep.addComponent(new LootComponent(sheep).addLoot(Item.SHEEP_EYE, 1, 2, 0.3));
@@ -144,5 +196,16 @@ public class Generator {
 		}
 
 		return bloodGroup;
+	}
+
+	public static Entity generateTree(double x, double y) {
+		Entity tree = new Entity(x, y, "Tree", "tree");
+		tree.addComponent(new SpriteListComponent(tree, "static",
+				new Pair<>("static", new Sprite("entities/large_tree"))
+		));
+		tree.addComponent(new AABBBoxComponent(tree, new Vector(45, 89), 29, 62));
+
+		tree.verifyComponents();
+		return tree;
 	}
 }

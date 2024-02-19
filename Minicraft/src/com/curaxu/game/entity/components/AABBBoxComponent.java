@@ -7,7 +7,6 @@ import com.curaxu.game.entity.AABBBox;
 import com.curaxu.game.entity.Entity;
 import com.curaxu.game.graphics.AbstractSprite;
 import com.curaxu.game.graphics.Screen;
-import com.curaxu.game.graphics.Sprite;
 
 public class AABBBoxComponent extends Component {
 	private AABBBox box;
@@ -17,34 +16,34 @@ public class AABBBoxComponent extends Component {
 	private SpriteListComponent spriteListComponent;
 	private boolean hasCollided = false;
 
-	public AABBBoxComponent(Entity entity, Vector position, int width, int height) {
+	public AABBBoxComponent(Entity entity, Vector offset, int width, int height) {
 		super(entity, "SpriteList");
 		spriteListComponent = (SpriteListComponent) entity.getComponent("SpriteList");
-		box = new AABBBox(position, width, height);
+		box = new AABBBox(entity.getWorldPos(), offset, width, height);
 	}
 
-	public AABBBoxComponent(Entity entity, Vector position, AbstractSprite sprite) {
+	public AABBBoxComponent(Entity entity, Vector offset, AbstractSprite sprite) {
 		super(entity, "SpriteList");
 		spriteListComponent = (SpriteListComponent) entity.getComponent("SpriteList");
-		box = new AABBBox(position, sprite);
+		box = new AABBBox(entity.getWorldPos(), offset, sprite);
 	}
 
-	public AABBBoxComponent(Entity entity, Vector position) {
+	public AABBBoxComponent(Entity entity, Vector offset) {
 		super(entity, "SpriteList");
 		spriteListComponent = (SpriteListComponent) entity.getComponent("SpriteList");
-		box = new AABBBox(position, spriteListComponent.getCurrentSprite());
+		box = new AABBBox(entity.getWorldPos(), offset, spriteListComponent.getCurrentSprite());
 	}
 
 	public void tick(double delta) {
-		box.setPosition(entity.getWorldPos());
+		box.setWorldPosition(entity.getWorldPos());
 	}
 
 	public void render(Screen screen) {
 		if (Settings.debugMode) {
-			screen.renderRect(box.getPosition().add(Game.getInstance().getScreen().getOffset()), (int) box.getWidth(), (int) box.getHeight(), hasCollided ? collideColour : uncollideColour);
+			screen.renderRect(box.getAbsolutePosition().add(Game.getInstance().getScreen().getOffset()), (int) box.getWidth(), (int) box.getHeight(), hasCollided ? collideColour : uncollideColour);
 		}
 	}
-	
+
 	public boolean hasCollided() {
 		return hasCollided;
 	}

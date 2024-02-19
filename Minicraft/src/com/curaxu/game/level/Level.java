@@ -1,6 +1,7 @@
 package com.curaxu.game.level;
 
 import com.curaxu.game.Game;
+import com.curaxu.game.Generator;
 import com.curaxu.game.PerlinNoise2D;
 import com.curaxu.game.Vector;
 import com.curaxu.game.entity.AABBBox;
@@ -35,10 +36,13 @@ public class Level {
 		this.tileIDs = new int[levelWidth * levelHeight];
 		this.tileSpriteIndices = new int[levelWidth * levelHeight];
 		Arrays.fill(tileSpriteIndices, -1);
+	}
 
+	public void initLevel() {
 		generateLevelWithNoise();
 		// generateLevelWithAutomata();
 		generateSpriteIndices();
+		generateTrees();
 		// generateExtras();
 	}
 
@@ -89,6 +93,19 @@ public class Level {
 			ImageIO.write(img, "PNG", new File("World.png"));
 		} catch (IOException e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	public void generateTrees() {
+		List<Vector> points = Generator.generatePoints(96, new Vector(32, 32), new Vector(320, 320));// levelWidth * Game.TILE_SIZE - 32, levelHeight * Game.TILE_SIZE - 32));
+		int amt = 0;
+		for (Vector point : points) {
+			Entity e = Generator.generateTree(point.getX(), point.getY());
+			Tile tile = Tile.getTileByID(getTileIDAtWorldPos(e.getWorldFootPos()));
+			if (amt++ >= 1) break;
+			if (tile == null || tile.equals(Tile.WATER))
+				continue;
+			addEntity(e);
 		}
 	}
 
@@ -172,42 +189,50 @@ public class Level {
 		return cs;
 	}
 
-	public HashMap<Entity, Collisions.CollisionData> getCollidedWithEntity(Entity e, String tag, boolean dynamic, double delta) {
-		AABBBoxComponent comp1 = (AABBBoxComponent) e.getComponent("AABBBox");
-		if (comp1 == null) return new HashMap<>();
-		AABBBox a = comp1.getBox();
+	// public HashMap<Entity, Collisions.CollisionData> getCollidedWithEntity(Entity e, String tag, boolean dynamic, double delta) {
+	// 	AABBBoxComponent comp1 = (AABBBoxComponent) e.getComponent("AABBBox");
+	// 	if (comp1 == null) return new HashMap<>();
+	// 	AABBBox a = comp1.getBox();
+	//
+	// 	MoveComponent comp2 = (MoveComponent) e.getComponent("Move");
+	// 	if (dynamic && comp2 == null) return new HashMap<>();
+	// 	Vector velocity = comp2 == null ? new Vector(0, 0) : comp2.getVelocity();
+	//
+	// 	if (!entityMap.containsKey(tag)) return new HashMap<>();
+	// 	HashMap<Entity, Collisions.CollisionData> collisions = new HashMap<>();
+	// 	for (Entity other : entityMap.get(tag)) {
+	// 		AABBBoxComponent otherBox = (AABBBoxComponent) other.getComponent("AABBBox");
+	// 		if (otherBox == null) continue;
+	// 		if ((!dynamic || velocity.isZero()) && Collisions.BoxVsBox(a, otherBox.getBox()))
+	// 			collisions.put(other, null);
+	// 		if (dynamic && !velocity.isZero()) {
+	// 			Collisions.CollisionData collisionData = Collisions.DynamicBoxVsBox(a, velocity, otherBox.getBox(), delta);
+	// 			if (collisionData != null) collisions.put(other, collisionData);
+	// 		}
+	// 	}
+	//
+	// 	// System.out.println(dynamic);
+	// 	// System.out.println(collisions);
+	// 	// System.exit(0);
+	// 	return collisions;
+	// }
 
-		MoveComponent comp2 = (MoveComponent) e.getComponent("Move");
-		if (dynamic && comp2 == null) return new HashMap<>();
-		Vector velocity = comp2 == null ? new Vector(0, 0) : comp2.getVelocity();
-
-		if (!entityMap.containsKey(tag)) return new HashMap<>();
-		HashMap<Entity, Collisions.CollisionData> collisions = new HashMap<>();
-		for (Entity other : entityMap.get(tag)) {
-			AABBBoxComponent otherBox = (AABBBoxComponent) other.getComponent("AABBBox");
-			if (otherBox == null) continue;
-			if ((!dynamic || velocity.isZero()) && Collisions.BoxVsBox(a, otherBox.getBox()))
-				collisions.put(other, null);
-			if (dynamic && !velocity.isZero()) {
-				Collisions.CollisionData collisionData = Collisions.DynamicBoxVsBox(a, velocity, otherBox.getBox(), delta);
-				if (collisionData != null) collisions.put(other, collisionData);
-			}
-		}
-
-		// System.out.println(dynamic);
-		// System.out.println(collisions);
-		// System.exit(0);
-		return collisions;
-	}
-
-	public List<Entity> getCollidedWithEntity(AABBBoxComponent box, String tag) {
+	public List<Entity> getCollidedWithEntity(AABBBox box, String tag) {
 		if (!entityMap.containsKey(tag)) return new ArrayList<>();
 		List<Entity> collisions = new ArrayList<>();
 		for (Entity item : entityMap.get(tag)) {
 			AABBBoxComponent itemBox = (AABBBoxComponent) item.getComponent("AABBBox");
-			if (Collisions.BoxVsBox(box.getBox(), itemBox.getBox())) collisions.add(item);
+			if (Collisions.BoxVsBox(box, itemBox.getBox())) collisions.add(item);
 		}
 		return collisions;
+	}
+
+	public List<Entity> getCollidedWithEntityNextFrame(Entity entity, Vector velocity, String tag) {
+		AABBBox a = ((AABBBoxComponent) entity.getComponent("AABBBox")).getBox();
+		AABBBox aNextFrame = new AABBBox(a.getAbsolutePosition().add(velocity), a.getOffset(), a.getSize());
+		// System.out.println(velocity);
+		// if (BoxVsBox(aNextFrame, b))
+		return getCollidedWithEntity(aNextFrame, tag);
 	}
 
 	public Entity getFirstCollidedWithEntity(Entity e, String tag) {

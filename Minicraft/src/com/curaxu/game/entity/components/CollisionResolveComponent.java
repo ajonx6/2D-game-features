@@ -1,10 +1,12 @@
 package com.curaxu.game.entity.components;
 
 import com.curaxu.game.Game;
+import com.curaxu.game.entity.AABBBox;
 import com.curaxu.game.entity.Collisions;
 import com.curaxu.game.entity.Entity;
 import com.curaxu.game.graphics.Screen;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -20,12 +22,26 @@ public abstract class CollisionResolveComponent extends Component {
 		this.dynamic = dynamic;
 	}
 
-	public abstract void onCollision(HashMap<Entity, Collisions.CollisionData> data, double delta);
+	// public abstract void onCollision(HashMap<Entity, Collisions.CollisionData> data, double delta);
+	public abstract void onCollision(List<Entity> data, double delta);
 
 	public abstract void noCollisions(double delta);
 
 	public void tick(double delta) {
-		HashMap<Entity, Collisions.CollisionData> collisions = Game.getInstance().level.getCollidedWithEntity(entity, tag, dynamic, delta);
+		// 	HashMap<Entity, Collisions.CollisionData> collisions = new HashMap<>();
+		// 	if (dynamic) collisions.putAll(Game.getInstance().level.getCollidedWithEntity(entity, tag, dynamic, delta));
+		// 	else {
+		// 		List<Entity> collided = Game.getInstance().level.getCollidedWithEntity((AABBBoxComponent) entity.getComponent("AABBBox"), tag);
+		// 		for (Entity e : collided) {
+		// 			collisions.put(e, null);
+		// 		}
+		// 	}
+		List<Entity> collisions = new ArrayList<>();
+		if (dynamic)
+			collisions = Game.getInstance().level.getCollidedWithEntityNextFrame(entity, ((MoveComponent) entity.getComponent("Move")).getVelocity(), tag);
+		else
+			collisions = Game.getInstance().level.getCollidedWithEntity(((AABBBoxComponent) entity.getComponent("AABBBox")).getBox(), tag);
+		
 		if (!collisions.isEmpty()) onCollision(collisions, delta);
 		else noCollisions(delta);
 	}

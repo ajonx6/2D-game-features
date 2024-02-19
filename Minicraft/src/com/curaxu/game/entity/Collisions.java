@@ -1,8 +1,7 @@
 package com.curaxu.game.entity;
 
+import com.curaxu.game.Game;
 import com.curaxu.game.Vector;
-import com.curaxu.game.entity.components.AABBBoxComponent;
-import com.curaxu.game.entity.components.MoveComponent;
 
 public class Collisions {
 	public static class CollisionData {
@@ -17,14 +16,14 @@ public class Collisions {
 	}
 
 	public static boolean PointVsBox(Vector pos, AABBBox a) {
-		return pos.getX() >= a.getPosition().getX() && pos.getY() >= a.getPosition().getY() && pos.getX() < a.getPosition().getX() + a.getWidth() && pos.getY() < a.getPosition().getY() + a.getHeight();
+		return pos.getX() >= a.getAbsolutePosition().getX() && pos.getY() >= a.getAbsolutePosition().getY() && pos.getX() < a.getAbsolutePosition().getX() + a.getWidth() && pos.getY() < a.getAbsolutePosition().getY() + a.getHeight();
 	}
 
 	public static boolean BoxVsBox(AABBBox a, AABBBox b) {
-		return a.getPosition().getX() < b.getPosition().getX() + b.getWidth() &&
-				a.getPosition().getX() + a.getWidth() > b.getPosition().getX() &&
-				a.getPosition().getY() < b.getPosition().getY() + b.getHeight() &&
-				a.getPosition().getY() + a.getHeight() > b.getPosition().getY();
+		return a.getAbsolutePosition().getX() < b.getAbsolutePosition().getX() + b.getWidth() &&
+				a.getAbsolutePosition().getX() + a.getWidth() > b.getAbsolutePosition().getX() &&
+				a.getAbsolutePosition().getY() < b.getAbsolutePosition().getY() + b.getHeight() &&
+				a.getAbsolutePosition().getY() + a.getHeight() > b.getAbsolutePosition().getY();
 	}
 
 	public static CollisionData RayVSBox(Vector rayOrigin, Vector rayDirection, AABBBox a) {
@@ -32,10 +31,10 @@ public class Collisions {
 		rayDirection = rayDirection.normalize();
 		// System.out.println("RAY");
 		// System.out.println(rayOrigin+", "+rayDirection);
-		
-		Vector tNear = a.getPosition().sub(rayOrigin).div(rayDirection);
-		Vector tFar = a.getPosition().add(a.getSize()).sub(rayOrigin).div(rayDirection);
-		
+
+		Vector tNear = a.getAbsolutePosition().sub(rayOrigin).div(rayDirection);
+		Vector tFar = a.getAbsolutePosition().add(a.getSize()).sub(rayOrigin).div(rayDirection);
+
 		if (tNear.getX() > tFar.getX()) {
 			double temp = tNear.getX();
 			tNear.setX(tFar.getX());
@@ -71,11 +70,11 @@ public class Collisions {
 	}
 
 	public static CollisionData DynamicBoxVsBox(AABBBox a, Vector velocity, AABBBox b, double delta) {
-		Vector newBoxPosition = b.getPosition().sub(a.getSize().div(2));
+		Vector newBoxPosition = b.getAbsolutePosition().sub(a.getSize().div(2.0));
 		Vector newBoxSize = b.getSize().add(a.getSize());
-		AABBBox expandedBox = new AABBBox(newBoxPosition, newBoxSize);
-
-		CollisionData collisionData = RayVSBox(a.getPosition().add(a.getSize().div(2)), velocity, expandedBox);
+		AABBBox expandedBox = new AABBBox(newBoxPosition, b.getOffset().sub(a.getSize().div(2.0)), newBoxSize);
+		
+		CollisionData collisionData = RayVSBox(a.getAbsolutePosition().add(a.getSize().div(2.0)), velocity, expandedBox);
 		if (collisionData != null && collisionData.contactTime <= 1.0) return collisionData;
 		else return null;
 	}
