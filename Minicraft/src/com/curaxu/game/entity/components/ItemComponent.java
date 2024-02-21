@@ -16,7 +16,7 @@ public class ItemComponent extends Component {
 	public void tick(double delta) {}
 
 	public void render(Screen screen) {
-		screen.renderSprite(entity.screenPos, item.getSprite());
+		screen.render(Screen.ENTITY_LAYER, entity.screenPos, item.getSprite());
 	}
 
 	public boolean isPickedUp() {

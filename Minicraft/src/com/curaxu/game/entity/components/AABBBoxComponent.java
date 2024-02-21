@@ -7,6 +7,7 @@ import com.curaxu.game.entity.AABBBox;
 import com.curaxu.game.entity.Entity;
 import com.curaxu.game.graphics.AbstractSprite;
 import com.curaxu.game.graphics.Screen;
+import com.curaxu.game.graphics.Sprite;
 
 public class AABBBoxComponent extends Component {
 	private AABBBox box;
@@ -40,7 +41,7 @@ public class AABBBoxComponent extends Component {
 
 	public void render(Screen screen) {
 		if (Settings.debugMode) {
-			screen.renderRect(box.getAbsolutePosition().add(Game.getInstance().getScreen().getOffset()), (int) box.getWidth(), (int) box.getHeight(), hasCollided ? collideColour : uncollideColour);
+			screen.render(Screen.DEBUG_LAYER, box.getAbsolutePosition().add(Game.getInstance().getScreen().getOffset()), new Sprite(hasCollided ? collideColour : uncollideColour, (int) box.getWidth(), (int) box.getHeight()));
 		}
 	}
 

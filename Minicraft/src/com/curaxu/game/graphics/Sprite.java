@@ -1,5 +1,6 @@
 package com.curaxu.game.graphics;
 
+import com.curaxu.game.Pair;
 import com.curaxu.game.Vector;
 
 import javax.imageio.ImageIO;
@@ -7,6 +8,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class Sprite implements AbstractSprite {
 	public static final int COLOR0 = 0xFF000000;
@@ -57,6 +59,32 @@ public class Sprite implements AbstractSprite {
 		}
 
 		return new Sprite(width, height, pxs);
+	}
+
+	public Sprite colour(HashMap<Integer, Integer> colours) {
+		int[] newPixels = new int[pixels.length];
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				if (colours.containsKey(pixels[x + y * width])) {
+					newPixels[x + y * width] = colours.get(pixels[x + y * width]);
+				} else {
+					newPixels[x + y * width] = pixels[x + y * width];
+				}
+			}
+		}
+		return new Sprite(width, height, newPixels);
+	}
+
+	public Sprite cut(int x, int y, int w, int h) {
+		int[] newPixels = new int[w * h];
+		for (int yy = 0; yy < h; yy++) {
+			int yp = yy + y;
+			for (int xx = 0; xx < w; xx++) {
+				int xp = xx + x;
+				newPixels[xx + yy * w] = pixels[xp + yp * width];
+			}
+		}
+		return new Sprite(w, h, newPixels);
 	}
 
 	public static Sprite createCircle(int radius, int colour) {

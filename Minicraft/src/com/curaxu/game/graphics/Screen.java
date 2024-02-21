@@ -1,10 +1,25 @@
 package com.curaxu.game.graphics;
 
+import com.curaxu.game.Pair;
 import com.curaxu.game.Vector;
+import com.curaxu.game.graphics.text.CustomFont;
+import com.curaxu.game.graphics.text.Text;
 
-import java.util.Arrays;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class Screen {
+	public static final int TILE_LAYER = 0;
+	public static final int ENTITY_LAYER = 1;
+	public static final int TEXT_LAYER = 2;
+	public static final int DEBUG_LAYER = 3;
+	public static final int UI_LAYER = 4;
+
+	// public List<Pair<Sprite, Point>> textLayer = new ArrayList<>();
+	public List<List<SpriteData>> layers = new ArrayList<>();
+
 	private Vector offset = new Vector();
 	private int width, height;
 	private int[] pixels;
@@ -13,6 +28,44 @@ public class Screen {
 		this.width = width;
 		this.height = height;
 		this.pixels = new int[width * height];
+
+		for (int i = 0; i < 5; i++) {
+			layers.add(new ArrayList<>());
+		}
+	}
+
+	public void tick() {
+		for (List<SpriteData> layer : layers) {
+			layer.clear();
+		}
+	}
+
+	public void render(int layer, Vector pos, AbstractSprite sprite) {
+		layers.get(layer).add(new SpriteData(sprite, pos));
+	}
+
+	public void render(int layer, double x, double y, AbstractSprite sprite) {
+		layers.get(layer).add(new SpriteData(sprite, new Vector(x, y)));
+	}
+
+	public void renderAll() {
+		for (List<SpriteData> layer : layers) {
+			for (SpriteData spriteData : layer) {
+				if (spriteData.getSpriteToCover() != null) {
+					if (spriteData.getSprite() instanceof ScrollableSprite)
+						renderSprite(spriteData.getPosition(), (ScrollableSprite) spriteData.getSprite(), spriteData.getSpriteToCover());
+					else
+						renderSprite(spriteData.getPosition(), spriteData.getSprite(), spriteData.getSpriteToCover());
+				} else {
+					if (spriteData.getSprite() instanceof ScrollableSprite)
+						renderSprite(spriteData.getPosition(), (ScrollableSprite) spriteData.getSprite());
+					else if (spriteData.getSprite() instanceof LayeredSprite) {
+						renderSprite(spriteData.getPosition(), (LayeredSprite) spriteData.getSprite());
+					} else
+						renderSprite(spriteData.getPosition(), spriteData.getSprite());
+				}
+			}
+		}
 	}
 
 	public void setPixel(int i, int col) {
@@ -28,7 +81,7 @@ public class Screen {
 		}
 	}
 
-	public void renderRect(Vector pos, int w, int h, int colour) {
+	private void renderRect(Vector pos, int w, int h, int colour) {
 		for (int yy = 0; yy < h; yy++) {
 			int yp = (int) (pos.getY() + yy);
 			for (int xx = 0; xx < w; xx++) {
@@ -40,7 +93,7 @@ public class Screen {
 		}
 	}
 
-	public void renderSprite(Vector pos, AbstractSprite sprite) {
+	private void renderSprite(Vector pos, AbstractSprite sprite) {
 		int[] pixels = sprite.getPixels();
 		for (int yy = 0; yy < sprite.getHeight(); yy++) {
 			int yp = (int) (pos.getY() + yy);
@@ -53,7 +106,7 @@ public class Screen {
 		}
 	}
 
-	public void renderSprite(Vector pos, AbstractSprite sprite, AbstractSprite toCover) {
+	private void renderSprite(Vector pos, AbstractSprite sprite, AbstractSprite toCover) {
 		int[] pixels = sprite.getPixels();
 		int[] coverPixels = toCover.getPixels();
 
@@ -71,7 +124,7 @@ public class Screen {
 		}
 	}
 
-	public void renderSprite(Vector pos, ScrollableSprite sprite) {
+	private void renderSprite(Vector pos, ScrollableSprite sprite) {
 		int[] pixels = sprite.getPixels();
 		for (int yy = 0; yy < sprite.getHeight(); yy++) {
 			int yp = (int) (pos.getY() + yy);
@@ -84,7 +137,7 @@ public class Screen {
 		}
 	}
 
-	public void renderSprite(Vector pos, ScrollableSprite sprite, AbstractSprite toCover) {
+	private void renderSprite(Vector pos, ScrollableSprite sprite, AbstractSprite toCover) {
 		int[] pixels = sprite.getPixels();
 		int[] coverPixels = toCover.getPixels();
 
@@ -102,7 +155,7 @@ public class Screen {
 		}
 	}
 
-	public void renderSprite(Vector pos, LayeredSprite sprite) {
+	private void renderSprite(Vector pos, LayeredSprite sprite) {
 		if (sprite.getLayers().isEmpty()) return;
 		LayeredSprite.Layer firstLayer = sprite.getLayers().get(0);
 		renderSprite(pos, firstLayer.getSprite());
@@ -121,7 +174,7 @@ public class Screen {
 		}
 	}
 
-	public void renderLight(Vector pos, int colour, int radius, boolean fade) {
+	private void renderLight(Vector pos, int colour, int radius, boolean fade) {
 		for (int yy = -radius; yy <= radius; yy++) {
 			int yp = (int) (pos.getY() + yy);
 			for (int xx = -radius; xx <= radius; xx++) {

@@ -33,7 +33,7 @@ public class SpriteListComponent extends Component {
 	}
 
 	public void render(Screen screen) {
-		screen.renderSprite(entity.getScreenPos(), currSprite);
+		screen.render(Screen.ENTITY_LAYER, entity.getScreenPos(), currSprite);
 	}
 
 	public void addToSprites(String name, Sprite sprite, int alpha, boolean overlay) {

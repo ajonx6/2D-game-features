@@ -29,6 +29,6 @@ public class Light {
     }
 
     public void render(Screen screen) {
-        screen.renderLight(screenPos, colour, radius, fade);
+        // screen.renderLight(screenPos, colour, radius, fade);
     }
 }

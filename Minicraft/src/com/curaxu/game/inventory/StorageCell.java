@@ -8,7 +8,7 @@ import com.curaxu.game.items.Item;
 
 public class StorageCell {
 	public static final Sprite cell = new Sprite("ui/inventory_cell");
-	public static final SpriteSheet digits = new SpriteSheet("digits", 3, 5);
+	public static final SpriteSheet digits = new SpriteSheet("ui/digits", 3, 5);
 
 	public static final int CELL_SIZE = 40;
 	public static final int CELL_GAP = 2;
@@ -34,7 +34,7 @@ public class StorageCell {
 	}
 
 	public void render(Screen screen, Sprite sprite, Vector position) {
-		screen.renderSprite(position, sprite);
+		screen.render(Screen.UI_LAYER, position, sprite);
 		if (item != null) {
 			Vector itemPos = position.add(new Vector(CELL_SIZE, CELL_SIZE).div(2)).sub(new Vector(item.getSprite().getWidth(), item.getSprite().getHeight()).div(2));
 			item.render(screen, itemPos);
@@ -46,7 +46,7 @@ public class StorageCell {
 			for (char c : strAmt.toCharArray()) {
 				int d = Character.getNumericValue(c);
 				Sprite s = digits.getSprite(d).coloured(0, 0, 0, DIGIT_COLOR);
-				screen.renderSprite(new Vector(startX, startY), s);
+				screen.render(Screen.UI_LAYER, new Vector(startX, startY), s);
 				startX += digits.getSpriteWidth() + 1;
 			}
 		}

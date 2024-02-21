@@ -273,7 +273,7 @@ public class Level {
 				if (!tileInBounds(x, y) || tileSpriteIndices[x + y * levelWidth] == -1 || getTileID(x, y) == 0)
 					continue;
 				Tile t = Tile.getTileByID(getTileID(x, y));
-				screen.renderSprite(Game.getInstance().getScreen().getOffset().add(new Vector(x * Game.TILE_SIZE, y * Game.TILE_SIZE)), t.getSprites()[tileSpriteIndices[x + y * levelWidth]]);
+				screen.render(Screen.TILE_LAYER, Game.getInstance().getScreen().getOffset().add(new Vector(x * Game.TILE_SIZE, y * Game.TILE_SIZE)), t.getSprites()[tileSpriteIndices[x + y * levelWidth]]);
 			}
 		}
 

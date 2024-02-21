@@ -8,10 +8,13 @@ import com.curaxu.game.audio.tracks.EndingTrack;
 import com.curaxu.game.audio.tracks.LoopTrack;
 import com.curaxu.game.audio.tracks.RandomTrack;
 import com.curaxu.game.entity.Entity;
+import com.curaxu.game.events.cutscenes.CameraFollowEvent;
 import com.curaxu.game.events.cutscenes.CameraMovementEvent;
 import com.curaxu.game.events.cutscenes.Cutscene;
 import com.curaxu.game.events.cutscenes.WaitEvent;
 import com.curaxu.game.graphics.Screen;
+import com.curaxu.game.graphics.text.CustomFont;
+import com.curaxu.game.graphics.text.Text;
 import com.curaxu.game.inventory.Hotbar;
 import com.curaxu.game.inventory.Storage;
 import com.curaxu.game.items.Item;
@@ -46,6 +49,7 @@ public class Game extends Canvas implements Runnable {
 	public Screen screen;
 	public Level level;
 	public Entity player;
+	public Entity npc;
 	public Random random = new Random();
 	public CompoundData sound;
 
@@ -54,28 +58,18 @@ public class Game extends Canvas implements Runnable {
 	public Hotbar hotbar;
 
 	public Cutscene group;
+	public Text text;
 
 	private Game() {
 		screen = new Screen(PIXEL_WIDTH, PIXEL_HEIGHT);
 		level = new Level(128, 72);
 		level.initLevel();
-
-		inventory = new Storage(6, 3);
-		inventory.setCellItem(0, 0, Item.KUNAI, 1);
-		inventory.setCellItem(1, 0, Item.EMPTY_VIAL, 14);
-		inventory.setCellItem(2, 0, Item.SHINY, 4);
-		hotbar = new Hotbar(inventory);
+		CustomFont.init();
 
 		player = Generator.generatePlayer(96, 96);
 		level.addEntity(player);
-
-		group = new Cutscene().addEvent(new CameraMovementEvent(new Vector(0, 0), new Vector(100, 100), 2.0)).addEvent(new WaitEvent(0.5)).addEvent(new CameraMovementEvent(new Vector(100, 100), new Vector(0, 0), 1.0));
-
-		sound = new CompoundData(
-				new LoopTrack("stone", "sounds/sfx/stone"),
-				new RandomTrack(new SoundGroup(new SoundData(SoundData.PLAY, 1, false)).addSound("ding", "sounds/sfx/ding").addSound("sound", "sounds/sfx/sound"), 2.0, 4.0),
-				new EndingTrack("lake", "sounds/music/lake", false)
-		);
+		npc = Generator.generateNPC(random.nextInt(Game.PIXEL_WIDTH), random.nextInt(Game.PIXEL_HEIGHT));
+		level.addEntity(npc);
 
 		for (int i = 0; i < 20; i++) {
 			if (random.nextBoolean())
@@ -83,6 +77,28 @@ public class Game extends Canvas implements Runnable {
 			else
 				level.addEntity(Generator.generateSheep(random.nextInt(Game.PIXEL_WIDTH), random.nextInt(Game.PIXEL_HEIGHT)));
 		}
+
+		inventory = new Storage(6, 3);
+		inventory.setCellItem(0, 0, Item.KUNAI, 1);
+		inventory.setCellItem(1, 0, Item.EMPTY_VIAL, 14);
+		inventory.setCellItem(2, 0, Item.SHINY, 4);
+		inventory.setCellItem(3, 0, Item.VOODOO, 1);
+		hotbar = new Hotbar(inventory);
+
+		group = new Cutscene().addEvent(new CameraMovementEvent(new Vector(0, 0), new Vector(100, 100), 2.0))
+				.addEvent(new WaitEvent(0.5))
+				.addEvent(new CameraMovementEvent(new Vector(100, 100), new Vector(250, 400), 1.5))
+				.addEvent(new CameraFollowEvent(npc, 2.5))
+				.addEvent(new CameraMovementEvent(new Vector(250, 400), new Vector(0, 0), 1.0));
+
+
+		sound = new CompoundData(
+				new LoopTrack("stone", "sounds/sfx/stone"),
+				new RandomTrack(new SoundGroup(new SoundData(SoundData.PLAY, 1, false)).addSound("ding", "sounds/sfx/ding").addSound("sound", "sounds/sfx/sound"), 2.0, 4.0),
+				new EndingTrack("lake", "sounds/music/lake", false)
+		);
+
+		text = new Text(CustomFont.getFont("brown_font"), "Test Text!:# : )", 100, 100, false);
 
 		// ParticleBlueprint pn1 = new ParticleBlueprint().setSize(5).setColors(0x22444444).setSpeed(8).setDirection(0.0, 360.0).setDeceleration(0).setLife(2).lifeDeterminesAlpha();
 		// ParticleBlueprint pn2 = new ParticleBlueprint().setSize(2).setColors(0xFFFF00FF, 0xFFFFFF00, 0xFF72DDE5).setSpeed(2.5).setDirection(0.0, 360.0).setDeceleration(0.1).setLife(2).lifeDeterminesAlpha();
@@ -199,11 +215,15 @@ public class Game extends Canvas implements Runnable {
 		if (KeyInput.wasPressed(KeyEvent.VK_I)) {
 			inventory.getCell(hotbar.getSelected(), 0).getItem().isSparkle(!inventory.getCell(hotbar.getSelected(), 0).getItem().isSparkle());
 		}
+		if (KeyInput.wasPressed(KeyEvent.VK_F)) {
+			inventory.getCell(hotbar.getSelected(), 0).getItem().isFire(!inventory.getCell(hotbar.getSelected(), 0).getItem().isFire());
+		}
 
 		SoundManager.tick(delta);
 		KeyInput.tick();
 		MouseInput.tick();
 
+		screen.tick();
 		group.tick(delta);
 		level.tick(delta);
 		level.removeEntities();
@@ -221,7 +241,10 @@ public class Game extends Canvas implements Runnable {
 
 		level.render(screen);
 		hotbar.render(screen);
+		text.render(screen);
 		if (showInventory) inventory.render(screen);
+
+		screen.renderAll();
 
 		int[] ps = screen.getPixels();
 		System.arraycopy(ps, 0, pixels, 0, pixels.length);

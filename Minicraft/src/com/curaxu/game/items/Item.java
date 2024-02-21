@@ -31,6 +31,7 @@ public class Item {
 	public static final Item SHINY = new Item("Shiny", new AnimatedSprite(new SpriteSheet("items/shiny", 32, 32)).setTimes(0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1), 32);
 	public static final Item SHEEP_EYE = new Item("Sheep Eye", new Sprite("items/sheep_eye"), 16);
 	public static final Item KUNAI = new Item("Kunai", new Sprite("items/kunai"), 1).addAction(new SwingAction(50, 30.0, 5));
+	public static final Item VOODOO = new Item("Voodoo", new Sprite("items/voodoo"), 1);
 
 	public static int nextId = 0;
 
@@ -42,6 +43,7 @@ public class Item {
 
 	private boolean isEnchanted = false;
 	private boolean isSparkle = false;
+	private boolean isFire = false;
 
 	public Item(String name, AbstractSprite sprite, int stackSize) {
 		this.id = nextId++;
@@ -102,7 +104,7 @@ public class Item {
 	}
 
 	public void render(Screen screen, Vector pos) {
-		screen.renderSprite(pos, sprite);
+		screen.render(Screen.UI_LAYER, pos, sprite);
 	}
 
 	public int getId() {
@@ -144,6 +146,19 @@ public class Item {
 			sprite.addLayer("sparkle", VisualEffect.SPARKLE, 255, true);
 		} else if (!sparkle && sprite.containsLayer("sparkle")) {
 			sprite.removeLayer("sparkle");
+		}
+	}
+
+	public boolean isFire() {
+		return isFire;
+	}
+
+	public void isFire(boolean fire) {
+		isFire = fire;
+		if (isFire && !sprite.containsLayer("fire")) {
+			sprite.addLayer("fire", VisualEffect.FIRE, 80, true);
+		} else if (!isFire && sprite.containsLayer("fire")) {
+			sprite.removeLayer("fire");
 		}
 	}
 
